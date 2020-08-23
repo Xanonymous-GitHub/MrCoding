@@ -2,9 +2,9 @@ import {Action, Module, Mutation, VuexModule, getModule} from 'vuex-module-decor
 import {Message, themeModes, Admin, User, MessageContainerType} from '@/api/types/apiTypes'
 import getBase64ImgPath from '@/utils/requestAvatar'
 import {getAdmin} from '@/api/api'
-import store from '@/store'
+import store from '@/store/index'
 
-@Module({name: 'app', stateFactory: true, namespaced: true, store})
+@Module({name: 'app', stateFactory: true, namespaced: true, store, dynamic: true})
 class AppStore extends VuexModule {
   private themeMode = themeModes.AUTO;
   
