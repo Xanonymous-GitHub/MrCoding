@@ -1,3 +1,5 @@
+export type Response<T> = Promise<T | Error>
+
 export interface Error {
   readonly statusCode?: number,
   readonly message?: string
@@ -37,7 +39,16 @@ export interface ReadMessage {
 }
 
 export interface SentMessage {
-  readonly context: string // the type of a message that been sending.
+  readonly context: string // the type of a message that will be sent.
+}
+
+export interface auth {
+  readonly username: string,
+  readonly password: string
+}
+
+export interface authResponse {
+  readonly token: string
 }
 
 // TODO: test if all 'readonly' is true of truth.
