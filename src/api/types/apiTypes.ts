@@ -42,11 +42,6 @@ export interface SentMessage {
   readonly context: string // the type of a message that will be sent.
 }
 
-export interface auth {
-  readonly username: string,
-  readonly password: string
-}
-
 export interface authResponse {
   readonly token: string
 }
