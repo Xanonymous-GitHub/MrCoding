@@ -1,0 +1,9 @@
+.msg-input {
+  align-items: center !important;
+  &--up-half {
+    justify-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    bottom: 1vh;
+  }
+}

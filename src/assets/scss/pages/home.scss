@@ -1,0 +1,30 @@
+.main-field {
+  height: 100%;
+  width: fit-content;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+
+  &__title {
+    cursor: default;
+    font-size: 12vw;
+    display: inline-block;
+  }
+
+  &__login-field {
+    max-width: 300px;
+    margin: auto;
+  }
+
+  &__chatroom-selection-field {
+    @extend .main-field__login-field;
+  }
+
+  &__buttons {
+    display: inline-block;
+  }
+}
+
+.home-page {
+  background-color: rgba(47, 73, 94, var(--bg-opacity));
+}

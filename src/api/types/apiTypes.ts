@@ -1,6 +1,6 @@
-export type Response<T> = Promise<T | Error>
+export type Response<T> = Promise<T | ResponseError>
 
-export interface Error {
+export interface ResponseError {
   readonly statusCode?: number,
   readonly message?: string
 }
@@ -44,6 +44,16 @@ export interface SentMessage {
 
 export interface authResponse {
   readonly token: string
+}
+
+export interface MessageContainerType {
+  [chatroomID: string]: Array<Message>
+}
+
+export enum themeModes {
+  AUTO = 'AUTO',
+  LIGHT = 'LIGHT',
+  DARK = 'DARK',
 }
 
 // TODO: test if all 'readonly' is true of truth.

@@ -1,0 +1,15 @@
+.msg-status {
+  margin-right: 5px;
+
+  &__text {
+    color: #7F828B;
+    font-size: 10px;
+    font-weight: bolder;
+    height: min-content;
+    text-align: right;
+    vertical-align: baseline;
+    line-height: 1.1em;
+    cursor: default;
+    white-space: nowrap;
+  }
+}

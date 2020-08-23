@@ -19,7 +19,7 @@
 <!--</script>-->
 
 <script lang="ts">
-// import "@/assets/scss/app.scss";
+import "@/assets/scss/app.scss";
 import {defineComponent, onMounted} from '@vue/composition-api';
 
 export default defineComponent({

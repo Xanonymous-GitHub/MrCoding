@@ -1,11 +1,12 @@
 import axios from 'axios';
-import {Response, ChatRoom, Error, Message, ReadMessage, authResponse, Admin} from "@/api/types/apiTypes";
+import {Response, ChatRoom, ResponseError, Message, ReadMessage, authResponse, Admin} from "@/api/types/apiTypes";
 
 axios.defaults.baseURL = 'https://mrcoding.org/api'
 axios.defaults.headers.common['Content-Type'] = 'application/json;charset=utf-8'
 
-const errorResolver = (e: any): Error => {
-  if ('response' in e && 'data' in e.response && e.response.data instanceof Error) {
+// eslint-disable-next-line
+const errorResolver = (e: any): ResponseError => {
+  if (e && e.response && e.response.data) {
     return e.response.data
   } else {
     return {

@@ -20,7 +20,8 @@ const renderRoutes = (() => {
 
 module.exports = {
   "transpileDependencies": [
-    "vuetify"
+    "vuetify",
+    "vuex-module-decorators"
   ],
   pages: {
     index: {
