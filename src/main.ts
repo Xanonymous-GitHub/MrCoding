@@ -8,9 +8,11 @@ import VueCompositionAPI from '@vue/composition-api'
 Vue.config.productionTip = false
 Vue.use(VueCompositionAPI)
 
-new Vue({
+const app = new Vue({
   router,
   vuetify,
   store,
   render: h => h(App)
-}).$mount('#app')
+})
+
+document.addEventListener('DOMContentLoaded', () => app.$mount('#app'))

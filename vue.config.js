@@ -19,6 +19,9 @@ const renderRoutes = (() => {
 
 
 module.exports = {
+  devServer: {
+    proxy: 'http://mrcoding.org:8787'
+  },
   "transpileDependencies": [
     "vuetify",
     "vuex-module-decorators"
@@ -35,6 +38,9 @@ module.exports = {
   productionSourceMap: false,
   css: {
     sourceMap: false,
+    extract: {
+      ignoreOrder: true,
+    },
     loaderOptions: {
       postcss: {
         map: false,
@@ -55,9 +61,7 @@ module.exports = {
       .maxAssetSize(1000000)
   },
   configureWebpack: config => {
-    config.optimization = {
-
-    }
+    config.optimization = {}
     const plugins = [];
     if (isProduction) {
       plugins.push(

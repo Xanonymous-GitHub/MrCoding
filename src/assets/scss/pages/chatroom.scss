@@ -1,0 +1,14 @@
+@import "../shared/container";
+
+@include _page('chatroom') {
+  .chat-room {
+
+    &--bottom {
+      bottom: 0;
+    }
+
+    &--fixed {
+      position: fixed;
+    }
+  }
+}

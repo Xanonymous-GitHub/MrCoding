@@ -1,4 +1,4 @@
-export default function (time?: number | undefined) {
+export default function (time?: number | undefined): string {
   const clientTime = new Date(time || Date.now())
   const isAm = clientTime.getHours() < 12
   const hour = clientTime.getHours()

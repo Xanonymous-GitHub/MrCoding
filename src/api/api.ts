@@ -17,10 +17,10 @@ const errorResolver = (e: any): ResponseError => {
 }
 
 const dualIdentityHeaders = (jwtToken?: string, userID?: string) => {
-  return () => ({
-    ...jwtToken && {Authorization: jwtToken},
+  return {
+    ...jwtToken && {Authorization: 'bearer ' + jwtToken},
     ...userID && {userID}
-  })
+  }
 }
 
 export const getAllChatRooms = async (jwtToken: string): Response<Array<ChatRoom>> => {

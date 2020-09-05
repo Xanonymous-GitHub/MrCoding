@@ -1,0 +1,31 @@
+$msg-box-background-color: #47494e;
+$msg-box-background-color-from-other: #0779e4;
+
+@mixin msg-box {
+  .msg-box {
+    width: fit-content;
+    border-radius: 20px;
+    font-weight: bolder;
+    max-width: min(500px, 70%);
+    background-color: $msg-box-background-color;
+    color: white;
+    cursor: default;
+    box-shadow: 2px 2px 8px -1px rgba(0, 0, 0, 0.75);
+    word-break: break-word;
+
+    &:hover {
+      transition: 0.3s;
+      background-color: lighten($msg-box-background-color, 15%);
+    }
+
+    @at-root &--from-other {
+      background-color: $msg-box-background-color-from-other;
+
+      &:hover {
+        transition: 0.3s;
+        background-color: lighten($msg-box-background-color-from-other, 15%);
+      }
+    }
+  }
+}
+

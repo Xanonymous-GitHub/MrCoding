@@ -1,0 +1,19 @@
+@import "msg/avatar";
+@import "msg/msg-box";
+@import "msg/msg-status";
+
+@mixin msg {
+  @include avatar;
+  @include msg-status;
+  @include msg-box;
+  .msg {
+    display: flex;
+    align-items: flex-end;
+
+    &--sent-by-self {
+      flex-direction: row-reverse;
+    }
+  }
+}
+
+@include msg;

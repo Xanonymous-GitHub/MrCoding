@@ -13,6 +13,15 @@ const routes: Array<RouteConfig> = [
       '@/pages/Home.vue'
       )
   },
+  {
+    path: '/:chatroom',
+    name: 'ChatRoom',
+    component: () => import(
+      /* webpackChunkName: "ChatRoom" */
+      /* webpackPrefetch: true */
+      '@/pages/Chatroom.vue'
+      )
+  },
 ]
 
 const router = new VueRouter({

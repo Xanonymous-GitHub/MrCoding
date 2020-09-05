@@ -21,7 +21,9 @@ class AppStore extends VuexModule {
     }
   ]
   
-  private messages: MessageContainerType = {chatroom: []}
+  private messages: MessageContainerType = {
+    chatroom: []
+  }
   
   private currentChatRoomId = ''
   
@@ -71,7 +73,7 @@ class AppStore extends VuexModule {
   @Action({commit: 'CREATE_MSG'})
   async createMsg({newMsg, insertPosition}: { newMsg: Message, insertPosition?: (number | undefined) }): Promise<{ newMsg: Message, insertPosition?: (number | undefined) }> {
     const currentUser = this.getCurrentUser
-    if (newMsg.author !== currentUser._id) {
+    if (newMsg.author !== (currentUser as (Admin | User))._id) {
       let otherUser = this.getOtherUsers.find(user => user._id === newMsg.author)
       if (!otherUser) {
         otherUser = (await getAdmin(newMsg.author)) as unknown as Admin
@@ -106,7 +108,7 @@ class AppStore extends VuexModule {
     return this.messages
   }
   
-  get getCurrentUser(): Admin | User {
+  get getCurrentUser(): (Admin | User) | undefined {
     return this.currentUser
   }
   
@@ -118,7 +120,7 @@ class AppStore extends VuexModule {
     return this.currentChatRoomId
   }
   
-  get getJwtKey(): string {
+  get getJwtKey(): string | undefined {
     return this.currentUserJwtToken
   }
 }

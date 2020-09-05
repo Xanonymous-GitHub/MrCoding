@@ -1,0 +1,5 @@
+@mixin _page($name) {
+  #app ##{$name}.page-container {
+    @content;
+  }
+}

@@ -1,66 +1,68 @@
 <template>
   <v-app class="home-page">
-    <div class="main-field">
-      <h1 class="main-field__title">
-        mr.coding
-      </h1>
-      <v-form id="form" ref="form" v-model="valid">
-        <div class="main-field__login-field" v-if="!logged">
+    <main class="page-container" id="home">
+      <div class="main-field">
+        <h1 class="main-field__title">
+          mr.coding
+        </h1>
+        <v-form id="form" ref="form" v-model="valid">
+          <div class="main-field__login-field" v-if="!logged">
+            <v-text-field
+                :disabled="loginInProgress"
+                :rules="loginRules"
+                @input="startInput"
+                @keypress.enter.prevent="login"
+                dense
+                label="username"
+                outlined
+                required
+                solo-inverted
+                v-model="username"
+            />
+            <v-text-field
+                :disabled="loginInProgress"
+                :rules="loginRules"
+                @input="startInput"
+                @keypress.enter.prevent="login"
+                dense
+                label="password"
+                outlined
+                required
+                solo-inverted
+                type="password"
+                v-model="password"
+            />
+            <p>{{ loginStatusMessages }}</p>
+            <div class="main-field__buttons">
+              <v-btn
+                  :disabled="!password||!username||loginInProgress"
+                  @click.exact.prevent.stop="login"
+                  color="success"
+                  small
+              >
+                LOGIN
+              </v-btn>
+            </div>
+          </div>
+        </v-form>
+        <div class="main-field__chatroom-selection-field" v-if="logged">
           <v-text-field
-              :disabled="loginInProgress"
-              :rules="loginRules"
-              @input="startInput"
-              @keypress.enter.prevent="login"
+              @keypress.enter.prevent="chatroomToGo.trim()&&$router.push(getWhereToGo.toString())"
               dense
-              label="username"
+              label="chatroom ID"
               outlined
               required
               solo-inverted
-              v-model="username"
+              v-model="chatroomToGo"
           />
-          <v-text-field
-              :disabled="loginInProgress"
-              :rules="loginRules"
-              @input="startInput"
-              @keypress.enter.prevent="login"
-              dense
-              label="password"
-              outlined
-              required
-              solo-inverted
-              type="password"
-              v-model="password"
-          />
-          <p>{{ loginStatusMessages }}</p>
           <div class="main-field__buttons">
-            <v-btn
-                :disabled="!password||!username||loginInProgress"
-                @click.exact.prevent.stop="login"
-                color="success"
-                small
-            >
-              LOGIN
+            <v-btn :disabled="!chatroomToGo" :to="getWhereToGo" color="primary" small>
+              GO THIS ROOM
             </v-btn>
           </div>
         </div>
-      </v-form>
-      <div class="main-field__chatroom-selection-field" v-if="logged">
-        <v-text-field
-            @keypress.enter.prevent="chatroomToGo.trim()&&$router.push(getWhereToGo.toString())"
-            dense
-            label="chatroom ID"
-            outlined
-            required
-            solo-inverted
-            v-model="chatroomToGo"
-        />
-        <div class="main-field__buttons">
-          <v-btn :disabled="!chatroomToGo" :to="getWhereToGo" color="primary" small>
-            GO THIS ROOM
-          </v-btn>
-        </div>
       </div>
-    </div>
+    </main>
   </v-app>
 </template>
 
@@ -86,6 +88,8 @@ export default defineComponent({
   name: "Home",
   props: {},
   setup() {
+    // In vue2 + composition API, 'this' is alias to 'vm.root'
+
     const loginRules = [
       (v: never) => !!v || 'required'
     ]
