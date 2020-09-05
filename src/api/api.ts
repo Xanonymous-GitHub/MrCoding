@@ -144,7 +144,7 @@ export const getAllAdmins = async (jwtToken: string): Response<Array<Admin>> => 
   }
 }
 
-export const getAdmin = async (adminID: string): Response<Admin> => {
+export const getSpecificAdmin = async (adminID: string): Response<Admin> => {
   try {
     const {data} = await axios.get(`/users/${adminID}`)
     return data

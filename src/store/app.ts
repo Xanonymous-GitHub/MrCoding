@@ -1,7 +1,7 @@
 import {Action, Module, Mutation, VuexModule, getModule} from 'vuex-module-decorators'
 import {Message, themeModes, Admin, User, MessageContainerType} from '@/api/types/apiTypes'
 import getBase64ImgPath from '@/utils/requestAvatar'
-import {getAdmin} from '@/api/api'
+import {getSpecificAdmin} from '@/api/api'
 import store from '@/store/index'
 
 @Module({name: 'app', stateFactory: true, namespaced: true, store, dynamic: true})
@@ -76,7 +76,7 @@ class AppStore extends VuexModule {
     if (newMsg.author !== (currentUser as (Admin | User))._id) {
       let otherUser = this.getOtherUsers.find(user => user._id === newMsg.author)
       if (!otherUser) {
-        otherUser = (await getAdmin(newMsg.author)) as unknown as Admin
+        otherUser = (await getSpecificAdmin(newMsg.author)) as unknown as Admin
         if (otherUser) {
           await this.addOtherUser(otherUser)
         }
