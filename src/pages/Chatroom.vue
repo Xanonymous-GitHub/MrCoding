@@ -1,6 +1,5 @@
 <template>
-  <v-app class="chat-room flex-column">
-    <main class="page-container" id="chatroom">
+  <v-app class="chat-room flex-column page-container" id="chatroom">
       <MsgArea :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode" id="msg-area"/>
       <BottomController
           :current-chat-room-id="currentChatRoomId"
@@ -10,7 +9,6 @@
           class="chat-room--bottom"
           id="bottom-controller"
       />
-    </main>
   </v-app>
 </template>
 
@@ -88,8 +86,7 @@ export default defineComponent({
 
     onBeforeMount(async () => {
       // set the current chatroom identify
-      const expectedChatRoomId = (vm.root.$route.params.chatRoom as string) || ''
-      appStore.SET_CHATROOM_ID(expectedChatRoomId)
+      const expectedChatRoomId = (vm.root.$route.params.chatroom as string) || ''
       // validate the chatroom is exist or not.
       const chatRoom = (await getChatRoom(expectedChatRoomId)) as ChatRoom
       if (('statusCode' in chatRoom) || (chatRoom?._id !== expectedChatRoomId)) {

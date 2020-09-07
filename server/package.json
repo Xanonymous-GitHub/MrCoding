@@ -1,0 +1,21 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "web-server for mr.coding",
+  "private": true,
+  "scripts": {
+    "clear": "rm -rf ./dist",
+    "serve": "npm run build && node ./dist/app.js",
+    "build": "npm run clear && parcel build app.ts --bundle-node-modules --no-source-maps --target node",
+    "upgrade": "npm upgrade --all && ncu -u"
+  },
+  "author": "Xanonymous",
+  "devDependencies": {
+    "compression": "^1.7.4",
+    "connect-history-api-fallback": "^1.6.0",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0",
+    "parcel-bundler": "^1.12.4",
+    "typescript": "^4.0.2"
+  }
+}

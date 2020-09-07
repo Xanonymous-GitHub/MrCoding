@@ -5,6 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:server": "cd server && npm run build",
+    "deploy": "npm run build && npm run build:server && cd server && rsync -vrh ./dist/* ../dist/",
     "lint": "vue-cli-service lint --fix",
     "upgrade": "npm upgrade --all && ncu -u"
   },

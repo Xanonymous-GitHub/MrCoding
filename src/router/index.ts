@@ -14,7 +14,7 @@ const routes: Array<RouteConfig> = [
       )
   },
   {
-    path: '/:chatroom',
+    path: '/chatroom/:chatroom',
     name: 'ChatRoom',
     component: () => import(
       /* webpackChunkName: "ChatRoom" */
