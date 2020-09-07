@@ -13,7 +13,7 @@ const getWebSocketExtraHeaders = (): { userID?: string, authorization?: string }
   }
 }
 
-const socket = io(isProduction ? '/' : 'localhost:3000', {
+const ioConfig = {
   path: '/socket.io',
   reconnection: true,
   reconnectionAttempts: 20,
@@ -27,6 +27,10 @@ const socket = io(isProduction ? '/' : 'localhost:3000', {
       extraHeaders: getWebSocketExtraHeaders()
     }
   },
-});
+}
 
-export default socket
+const socketSeed = () => io(isProduction ? '/' : 'localhost:3000', ioConfig);
+
+export type ioType = SocketIOClient.Socket
+
+export default new Promise($export => $export(socketSeed))

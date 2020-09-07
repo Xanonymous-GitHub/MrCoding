@@ -6,18 +6,6 @@
   </router-view>
 </template>
 
-<!--<template>-->
-<!--  <div></div>-->
-<!--</template>-->
-
-<!--<script lang="ts">-->
-<!--  import {defineComponent} from '@vue/composition-api';-->
-<!--  -->
-<!--  export default defineComponent({-->
-<!--    name: ""-->
-<!--  });-->
-<!--</script>-->
-
 <script lang="ts">
 import appStore from '@/store/app'
 import "@/assets/scss/app.scss";
@@ -57,13 +45,13 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      document.dispatchEvent(new Event('app-rendered'));
       appStore.SET_THEME_MODE(detectTheme())
       window
           .matchMedia('(prefers-color-scheme: dark)')
           .addEventListener('change', () => {
             appStore.SET_THEME_MODE(detectTheme())
           })
-      document.dispatchEvent(new Event('app-rendered'));
     })
 
     return {};

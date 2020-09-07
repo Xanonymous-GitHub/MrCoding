@@ -6,9 +6,9 @@ import {jwtSignIn} from "@/api/api";
 export default async function (key?: string): Promise<boolean> {
   const token = key || appStore.getJwtKey || await getJwtTokenFromLocalStorage()
   if (token) {
-    appStore.setCurrentUserJwtToken(token)
     const admin = (await jwtSignIn(token)) as unknown as Admin
     if (admin && !('statusCode' in admin) && ('_id' in admin)) {
+      await appStore.setCurrentUserJwtToken(token)
       await appStore.setCurrentUser(admin)
       return true
     }

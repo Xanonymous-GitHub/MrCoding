@@ -73,9 +73,8 @@ import {
   onMounted,
   reactive,
   toRefs,
-  onBeforeMount,
   UnwrapRef,
-  ComputedRef
+  ComputedRef,
 } from '@vue/composition-api';
 import appStore from '@/store/app'
 import adminDataFetcher from '@/utils/adminDataFetcher'
@@ -83,13 +82,13 @@ import {setJwtToLocalStorageWithExpire} from '@/utils/jwtTokenController'
 import {auth} from "@/api/api"
 import '@/assets/scss/pages/home.scss'
 import {authResponse} from "@/api/types/apiTypes";
+import autoLogin from "@/api/accountManager";
 
 export default defineComponent({
   name: "Home",
   props: {},
   setup() {
     // In vue2 + composition API, 'this' is alias to 'vm.root'
-
     const loginRules = [
       (v: never) => !!v || 'required'
     ]
@@ -98,21 +97,21 @@ export default defineComponent({
     const data: UnwrapRef<{
       valid: boolean,
       password: string,
-      logged: boolean,
       loginInProgress: boolean,
       getWhereToGo: ComputedRef<string>,
       chatroomToGo: string,
       loginStatusMessages: string,
-      username: string
+      username: string,
+      logged: ComputedRef<boolean>
     }> = reactive({
       loginInProgress: false,
-      logged: false,
       username: '',
       password: '',
       chatroomToGo: '',
       loginStatusMessages: '',
       valid: true,
-      getWhereToGo: computed((): string => '/chatroom/' + data.chatroomToGo.trim())
+      getWhereToGo: computed((): string => '/chatroom/' + data.chatroomToGo.trim()),
+      logged: computed(() => appStore.isLoggedIn)
     })
 
     const startInput = () => {
@@ -130,7 +129,6 @@ export default defineComponent({
             await setJwtToLocalStorageWithExpire(token)
             appStore.setCurrentUserJwtToken(token)
             startInput()
-            data.logged = true
           } else {
             data.loginStatusMessages = 'jwt validation failed'
           }
@@ -141,18 +139,10 @@ export default defineComponent({
       data.loginInProgress = false
     }
 
-    onBeforeMount(async () => {
-      if (await adminDataFetcher()) {
-        startInput()
-        await new Promise((resolve) => {
-          data.logged = true
-          resolve()
-        })
-      }
-    })
-
     onMounted(() => {
+      startInput()
       document.dispatchEvent(new Event('app-rendered'));
+      autoLogin()
     })
 
     return {

@@ -14,7 +14,7 @@
       <v-icon>mdi-message-reply-text</v-icon>
     </template>
     <template #append-outer>
-      <v-btn @click.prevent="sendMessage" fab icon small>
+      <v-btn :disabled="!textContent" @click.prevent="sendMessage" fab icon small>
         <v-icon>mdi-send</v-icon>
       </v-btn>
     </template>

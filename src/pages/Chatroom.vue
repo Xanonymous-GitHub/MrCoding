@@ -1,14 +1,14 @@
 <template>
   <v-app class="chat-room flex-column page-container" id="chatroom">
-      <MsgArea :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode" id="msg-area"/>
-      <BottomController
-          :current-chat-room-id="currentChatRoomId"
-          :is-dark-mode="isDarkMode"
-          @scrollMsgAreaToEnd="scrollMsgAreaToEnd"
-          @sendNewMsg="sendNewMsg"
-          class="chat-room--bottom"
-          id="bottom-controller"
-      />
+    <MsgArea :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode" id="msg-area"/>
+    <BottomController
+        :current-chat-room-id="currentChatRoomId"
+        :is-dark-mode="isDarkMode"
+        @scrollMsgAreaToEnd="scrollMsgAreaToEnd"
+        @sendNewMsg="sendNewMsg"
+        class="chat-room--bottom"
+        id="bottom-controller"
+    />
   </v-app>
 </template>
 
@@ -17,20 +17,19 @@ import {
   computed,
   defineComponent,
   onBeforeMount,
-  onBeforeUnmount,
   onMounted,
   reactive,
   toRefs,
 } from '@vue/composition-api'
 import '@/assets/scss/pages/chatroom.scss'
 import appStore from '@/store/app'
-import {getChatRoom, getLatestMessage, sendMessage} from "@/api/api";
+import {getChatRoom, getHistory, getLatestMessage, sendMessage} from "@/api/api";
 import {ChatRoom, Message} from "@/api/types/apiTypes";
-import adminDataFetcher from '@/utils/adminDataFetcher'
-import socket from "@/api/webSocketManager";
 // import {VueRouter} from "vue-router/types/router";
 import MsgArea from "@/components/MsgArea.vue";
 import BottomController from "@/components/BottomController.vue";
+import {ioType} from "@/api/webSocketManager";
+import autoLogin from "@/api/accountManager";
 
 export default defineComponent({
   name: "ChatRoom",
@@ -62,7 +61,10 @@ export default defineComponent({
       return
     }
 
+    // eslint-disable-next-line no-undef
     const initializeWebSocket = async (): Promise<void> => {
+      const socketSeed = await (async () => await (await import('@/api/webSocketManager')).default)() as unknown as (() => ioType);
+      const socket = socketSeed()
       socket.on('successfullyJoinedChatRoomOfMrCodingPlatformInNationalTaipeiUniversityOfTechnologyProgrammingClub', chatroomJoined)
       socket.on('message', receiveNewMsg)
       socket.on('exception', webSocketException)
@@ -76,7 +78,14 @@ export default defineComponent({
     }
 
     const sendNewMsg = (newMsg: string): void => {
-      sendMessage(data.currentChatRoomId, newMsg, (appStore.getJwtKey || undefined), (appStore.getCurrentUser?._id || undefined))
+      if (newMsg) {
+        sendMessage(data.currentChatRoomId, newMsg, (appStore.getJwtKey || undefined), (appStore.getCurrentUser?._id || undefined))
+      }
+    }
+
+    const loadHistoryMessages = async () => {
+      const messages = await getHistory(data.currentChatRoomId, 1, 99999, (appStore.getJwtKey || undefined), (appStore.getCurrentUser?._id || undefined)) as unknown as Array<Message>
+      messages.forEach((newMsg: Message, insertPosition: number) => appStore.createMsg({newMsg, insertPosition}))
     }
 
     const scrollMsgAreaToEnd = (): void => {
@@ -102,21 +111,10 @@ export default defineComponent({
       const bottomController = document.getElementById('bottom-controller') as HTMLElement
       // modify the chatroom size to adapt the screen
       setMsgAreaPadding(msgArea, bottomController)
-      // check if login
-      if (!await adminDataFetcher()) {
-        // alert('please login!')
-        // await (vm.root.$options.router as VueRouter).push('/')
-        return
-      } else {
-        // register the new msg event.
-        await initializeWebSocket()
-      }
-    })
-
-    onBeforeUnmount(() => {
-      if (socket) {
-        socket.disconnect()
-      }
+      // load socketIO instance factory function after login
+      await autoLogin()
+      await initializeWebSocket()
+      await loadHistoryMessages()
     })
 
     return {

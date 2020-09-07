@@ -29,6 +29,8 @@ class AppStore extends VuexModule {
   
   private currentUserJwtToken = ''
   
+  private sendingLogInRequest = false
+  
   private static async newUser(originalData: User | Admin): Promise<User | Admin> {
     if (originalData && 'avatar' in originalData && originalData.avatar) {
       originalData.avatar = await getBase64ImgPath(originalData.avatar)
@@ -68,6 +70,11 @@ class AppStore extends VuexModule {
   @Mutation
   SET_CURRENT_USER_JWT_TOKEN(jwtToken: string): void {
     this.currentUserJwtToken = jwtToken
+  }
+  
+  @Mutation
+  SET_SENDING_LOGIN_REQUEST(status: boolean): void {
+    this.sendingLogInRequest = status
   }
   
   @Action({commit: 'CREATE_MSG'})
@@ -122,6 +129,14 @@ class AppStore extends VuexModule {
   
   get getJwtKey(): string | undefined {
     return this.currentUserJwtToken
+  }
+  
+  get isLoggedIn(): boolean {
+    return Boolean(this.currentUser._id)
+  }
+  
+  get isSendingLogInRequest(): boolean {
+    return this.sendingLogInRequest
   }
 }
 
