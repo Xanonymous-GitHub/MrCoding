@@ -1,0 +1,15 @@
+@import "../shared/container";
+
+@include _page('dashboard') {
+  .dashboard-field {
+    font-size: 2em;
+    color: #0d47a1;
+
+    .chatroom-list {
+
+      .chatroom {
+        display: block;
+      }
+    }
+  }
+}

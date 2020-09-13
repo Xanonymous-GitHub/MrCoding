@@ -1,5 +1,5 @@
 import {Action, Module, Mutation, VuexModule, getModule} from 'vuex-module-decorators'
-import {Message, themeModes, Admin, User, MessageContainerType} from '@/api/types/apiTypes'
+import {Message, themeModes, Admin, User} from '@/api/types/apiTypes'
 import getBase64ImgPath from '@/utils/requestAvatar'
 import {getSpecificAdmin} from '@/api/api'
 import store from '@/store/index'
@@ -21,9 +21,7 @@ class AppStore extends VuexModule {
     }
   ]
   
-  private messages: MessageContainerType = {
-    chatroom: []
-  }
+  private currentChatroomMessagesBox: Array<Message> = []
   
   private currentChatRoomId = ''
   
@@ -56,10 +54,11 @@ class AppStore extends VuexModule {
   @Mutation
   CREATE_MSG({newMsg, insertPosition}: { newMsg: Message, insertPosition: number }): void {
     if (insertPosition) {
-      this.messages.chatroom.splice(insertPosition, 0, newMsg)
+      this.currentChatroomMessagesBox.splice(insertPosition, 0, newMsg)
     } else {
-      this.messages.chatroom.push(newMsg)
+      this.currentChatroomMessagesBox.push(newMsg)
     }
+    console.log(this.currentChatroomMessagesBox)
   }
   
   @Mutation
@@ -75,6 +74,11 @@ class AppStore extends VuexModule {
   @Mutation
   SET_SENDING_LOGIN_REQUEST(status: boolean): void {
     this.sendingLogInRequest = status
+  }
+  
+  @Mutation
+  CLEAN_CURRENT_CHATROOM_MESSAGES_BOX(): void {
+    this.currentChatroomMessagesBox = []
   }
   
   @Action({commit: 'CREATE_MSG'})
@@ -111,8 +115,8 @@ class AppStore extends VuexModule {
     return this.themeMode === themeModes.DARK
   }
   
-  get getMessage(): MessageContainerType {
-    return this.messages
+  get getMessage(): Array<Message> {
+    return this.currentChatroomMessagesBox
   }
   
   get getCurrentUser(): (Admin | User) | undefined {

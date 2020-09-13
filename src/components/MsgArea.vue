@@ -32,11 +32,11 @@ export default defineComponent({
     currentChatRoomId: {
       required: true,
       type: String
-    }
+    },
   },
   setup() {
     const data = reactive({
-      messages: computed(() => appStore.getMessage.chatroom)
+      messages: computed(() => appStore.getMessage)
     })
 
     const msgOwner = (msgAuthor: string) => {

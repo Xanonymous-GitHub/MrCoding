@@ -18,6 +18,7 @@ import {
   defineComponent,
   onBeforeMount,
   onMounted,
+  onBeforeUnmount,
   reactive,
   toRefs,
 } from '@vue/composition-api'
@@ -75,6 +76,7 @@ export default defineComponent({
     const receiveNewMsg = async (): Promise<void> => {
       const newMsg = (await getLatestMessage(data.currentChatRoomId, (appStore.getJwtKey || undefined), (appStore.getCurrentUser?._id || undefined))) as unknown as Message
       await appStore.createMsg({newMsg})
+      console.log('received a message!')
     }
 
     const sendNewMsg = (newMsg: string): void => {
@@ -94,8 +96,10 @@ export default defineComponent({
     }
 
     onBeforeMount(async () => {
+      console.log('onBeforeMount')
       // set the current chatroom identify
       const expectedChatRoomId = (vm.root.$route.params.chatroom as string) || ''
+      console.log('now is in roomNumber: ' + expectedChatRoomId)
       // validate the chatroom is exist or not.
       const chatRoom = (await getChatRoom(expectedChatRoomId)) as ChatRoom
       if (('statusCode' in chatRoom) || (chatRoom?._id !== expectedChatRoomId)) {
@@ -103,10 +107,12 @@ export default defineComponent({
         // await (vm.root.$options.router as VueRouter).push('/')
         return
       }
-      appStore.SET_CHATROOM_ID(expectedChatRoomId)
+      await appStore.SET_CHATROOM_ID(expectedChatRoomId)
+      await appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
     })
 
     onMounted(async () => {
+      console.log('onMounted')
       const msgArea = document.getElementById('msg-area') as HTMLDivElement
       const bottomController = document.getElementById('bottom-controller') as HTMLElement
       // modify the chatroom size to adapt the screen
@@ -115,6 +121,12 @@ export default defineComponent({
       await autoLogin()
       await initializeWebSocket()
       await loadHistoryMessages()
+    })
+
+    onBeforeUnmount(() => {
+      console.log('onBeforeUnmount')
+      appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
+      document.dispatchEvent(new Event('BeforeUnmount'));
     })
 
     return {
