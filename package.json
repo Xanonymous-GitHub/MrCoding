@@ -22,6 +22,7 @@
     "vuex": "^3.5.1"
   },
   "devDependencies": {
+    "@line/liff": "^2.4.0",
     "@typescript-eslint/eslint-plugin": "^4.1.0",
     "@typescript-eslint/parser": "^4.1.0",
     "@vue/cli-plugin-babel": "^4.5.6",

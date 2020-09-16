@@ -195,3 +195,14 @@ export const jwtSignIn = async (jwtToken: string): Response<Admin> => {
     return errorResolver(e)
   }
 }
+
+export const bindLineUserUidToChatroom = async (id: string, liffUserID: string): Response<ChatRoom> => {
+  try {
+    const {data} = await axios.patch(`/chatrooms/${id}/liffUserID`, {
+      liffUserID
+    })
+    return data
+  } catch (e) {
+    return errorResolver(e)
+  }
+}

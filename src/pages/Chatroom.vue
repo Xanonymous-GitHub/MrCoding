@@ -24,8 +24,8 @@ import {
 } from '@vue/composition-api'
 import '@/assets/scss/pages/chatroom.scss'
 import appStore from '@/store/app'
-import {getChatRoom, getHistory, getLatestMessage, sendMessage} from "@/api/api";
-import {ChatRoom, Message} from "@/api/types/apiTypes";
+import {bindLineUserUidToChatroom, getChatRoom, getHistory, getLatestMessage, sendMessage} from "@/api/api";
+import {Admin, ChatRoom, Message, User} from "@/api/types/apiTypes";
 // import {VueRouter} from "vue-router/types/router";
 import MsgArea from "@/components/MsgArea.vue";
 import BottomController from "@/components/BottomController.vue";
@@ -47,6 +47,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const webSocketException = (e: any): void => {
       alert(e.message)
+      console.log(e.message)
     }
 
     const setMsgAreaPadding = (msgArea: HTMLDivElement, bottomController: HTMLElement): void => {
@@ -62,14 +63,13 @@ export default defineComponent({
       return
     }
 
-    // eslint-disable-next-line no-undef
     const initializeWebSocket = async (): Promise<void> => {
       const socketSeed = await (async () => await (await import('@/api/webSocketManager')).default)() as unknown as (() => ioType);
       const socket = socketSeed()
       socket.on('successfullyJoinedChatRoomOfMrCodingPlatformInNationalTaipeiUniversityOfTechnologyProgrammingClub', chatroomJoined)
       socket.on('message', receiveNewMsg)
       socket.on('exception', webSocketException)
-      await socket.open() // connect to the server
+      await socket.open()
       socket.emit('join', data.currentChatRoomId)
     }
 
@@ -95,11 +95,13 @@ export default defineComponent({
       msgArea.scrollIntoView(false)
     }
 
-    onBeforeMount(async () => {
-      console.log('onBeforeMount')
+    onMounted(async () => {
+      console.log('onMounted')
+
       // set the current chatroom identify
       const expectedChatRoomId = (vm.root.$route.params.chatroom as string) || ''
       console.log('now is in roomNumber: ' + expectedChatRoomId)
+
       // validate the chatroom is exist or not.
       const chatRoom = (await getChatRoom(expectedChatRoomId)) as ChatRoom
       if (('statusCode' in chatRoom) || (chatRoom?._id !== expectedChatRoomId)) {
@@ -109,18 +111,42 @@ export default defineComponent({
       }
       await appStore.SET_CHATROOM_ID(expectedChatRoomId)
       await appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
-    })
 
-    onMounted(async () => {
-      console.log('onMounted')
       const msgArea = document.getElementById('msg-area') as HTMLDivElement
       const bottomController = document.getElementById('bottom-controller') as HTMLElement
       // modify the chatroom size to adapt the screen
       setMsgAreaPadding(msgArea, bottomController)
       // load socketIO instance factory function after login
-      await autoLogin()
+      await autoLogin(vm.root.$route)
+      const currentUser = appStore.getCurrentUser
+      if (currentUser && (!('cc' in currentUser)) && !chatRoom.liffUserID) {
+        await bindLineUserUidToChatroom(data.currentChatRoomId, currentUser?._id || '')
+        console.log('bind -> ' + currentUser?._id)
+      }
+
+      await appStore.createMsg({
+        newMsg: {
+          _id: 'test1',
+          author: (appStore.getCurrentUser as (User | Admin))._id,
+          read: false,
+          context: '123456',
+          chatroomID: data.currentChatRoomId,
+          updateAt: '123456789'
+        }
+      })
+      await appStore.createMsg({
+        newMsg: {
+          _id: 'test2',
+          author: (appStore.getCurrentUser as (User | Admin))._id,
+          read: false,
+          context: (appStore.getCurrentUser)?._id,
+          chatroomID: data.currentChatRoomId,
+          updateAt: '123456789'
+        }
+      })
+
       await initializeWebSocket()
-      await loadHistoryMessages()
+      // await loadHistoryMessages()
     })
 
     onBeforeUnmount(() => {

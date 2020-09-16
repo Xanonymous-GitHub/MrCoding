@@ -6,22 +6,24 @@ export interface ResponseError {
 }
 
 export interface User {
-  readonly _id: string, // line uuid or admin's mongo id.
+  readonly _id: string, // line uuid or admin mongo id.
+  username: string, // admins' self-set name, or the line user's displayName.
+  avatar?: string, // user avatar url (at the first time)
 }
 
 export interface Admin extends User {
-  username: string, // admins' self-set name, or the line uuid of general users
-  avatar?: string, // user avatar url(at the first time)
   info?: string, // user profile
   readonly cc: boolean // show that if the user is verified by us(dev team)
 }
 
 export interface ChatRoom {
   readonly _id: string, // mongoose id, absolutely unique, is the route path at /:chatroom
-  readonly owner?: string, // the hashed user's line uuid => hashed[(username])
+  // readonly owner?: string, // the hashed user's line uuid => hashed[(username])
+  readonly lineChatroomUserID: string, // the uid from backend that match to the specific user in this room.
+  liffUserID?: string, // the LINE user's uid from liff.getProfile().userId
   readonly identify: string, // generated from 'createChatRoom' in google script
   closed: boolean // show that if this room is closed or not.
-  readonly lineAccessToken: string // the line accessToken from [owner]
+  // readonly lineAccessToken: string // the line accessToken from [owner]
 }
 
 export interface Message {
@@ -46,14 +48,8 @@ export interface authResponse {
   readonly token: string
 }
 
-export interface MessageContainerType {
-  [chatroomID: string]: Array<Message>
-}
-
 export enum themeModes {
   AUTO = 'AUTO',
   LIGHT = 'LIGHT',
   DARK = 'DARK',
 }
-
-// TODO: test if all 'readonly' is true of truth.

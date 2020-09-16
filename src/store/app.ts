@@ -9,7 +9,9 @@ class AppStore extends VuexModule {
   private themeMode = themeModes.AUTO;
   
   private currentUser: Admin | User = {
-    _id: ''
+    _id: '',
+    username: '',
+    avatar: ''
   }
   
   private otherUsers: Array<Admin | User> = [
@@ -29,12 +31,19 @@ class AppStore extends VuexModule {
   
   private sendingLogInRequest = false
   
+  // private liffInstance = {}
+  
   private static async newUser(originalData: User | Admin): Promise<User | Admin> {
     if (originalData && 'avatar' in originalData && originalData.avatar) {
       originalData.avatar = await getBase64ImgPath(originalData.avatar)
     }
     return originalData
   }
+  
+  // @Mutation
+  // INIT_LIFF_INSTANCE(){
+  //
+  // }
   
   @Mutation
   SET_THEME_MODE(mode: themeModes): void {

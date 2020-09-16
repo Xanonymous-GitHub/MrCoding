@@ -15,14 +15,23 @@ const routes: Array<RouteConfig> = [
       )
   },
   {
+    path: '/chatroom',
+    name: 'ChatroomRedirect',
+    component: () => import(
+      /* webpackChunkName: "ChatroomRedirect" */
+      /* webpackPrefetch: true */
+      '@/pages/ChatroomRedirect.vue'
+      )
+  },
+  {
     path: '/chatroom/:chatroom',
-    name: 'ChatRoom',
+    name: 'Chatroom',
     beforeEnter(to, from, next) {
       appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
       next()
     },
     component: () => import(
-      /* webpackChunkName: "ChatRoom" */
+      /* webpackChunkName: "Chatroom" */
       /* webpackPrefetch: true */
       '@/pages/Chatroom.vue'
       )
