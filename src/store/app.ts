@@ -31,7 +31,7 @@ class AppStore extends VuexModule {
   
   private sendingLogInRequest = false
   
-  // private liffInstance = {}
+  private lineAccessToken = ''
   
   private static async newUser(originalData: User | Admin): Promise<User | Admin> {
     if (originalData && 'avatar' in originalData && originalData.avatar) {
@@ -39,11 +39,6 @@ class AppStore extends VuexModule {
     }
     return originalData
   }
-  
-  // @Mutation
-  // INIT_LIFF_INSTANCE(){
-  //
-  // }
   
   @Mutation
   SET_THEME_MODE(mode: themeModes): void {
@@ -58,6 +53,11 @@ class AppStore extends VuexModule {
   @Mutation
   ADD_OTHER_USER(otherUser: User | Admin): void {
     this.otherUsers.push(otherUser)
+  }
+  
+  @Mutation
+  ADD_LINE_ACCESS_TOKEN(token: string): void {
+    this.lineAccessToken = token
   }
   
   @Mutation
@@ -150,6 +150,10 @@ class AppStore extends VuexModule {
   
   get isSendingLogInRequest(): boolean {
     return this.sendingLogInRequest
+  }
+  
+  get getLineAccessToken(): string {
+    return this.lineAccessToken
   }
 }
 

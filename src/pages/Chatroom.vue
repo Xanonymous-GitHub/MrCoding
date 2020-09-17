@@ -117,7 +117,7 @@ export default defineComponent({
       // modify the chatroom size to adapt the screen
       setMsgAreaPadding(msgArea, bottomController)
       // load socketIO instance factory function after login
-      await autoLogin(vm.root.$route)
+      await autoLogin()
       const currentUser = appStore.getCurrentUser
       if (currentUser && (!('cc' in currentUser)) && !chatRoom.liffUserID) {
         await bindLineUserUidToChatroom(data.currentChatRoomId, currentUser?._id || '')

@@ -18,22 +18,20 @@ export interface Admin extends User {
 
 export interface ChatRoom {
   readonly _id: string, // mongoose id, absolutely unique, is the route path at /:chatroom
-  // readonly owner?: string, // the hashed user's line uuid => hashed[(username])
   readonly lineChatroomUserID: string, // the uid from backend that match to the specific user in this room.
   liffUserID?: string, // the LINE user's uid from liff.getProfile().userId
   readonly identify: string, // generated from 'createChatRoom' in google script
   closed: boolean // show that if this room is closed or not.
-  // readonly lineAccessToken: string // the line accessToken from [owner]
 }
 
 export interface Message {
   readonly _id: string, // mongoose id, absolutely unique
-  readonly author: string, // user's [_id]
+  readonly author: string, // admin _id or liffUserID
   read: boolean, // show that if this is read by someone (the other user in same chatroom)
   context?: string, // text content of this msg, will change to contain not only texts but also medias
   chatroomID: string, // the chatroom's [_id](mongoose id, absolutely unique)
   updateAt: string, // the last time of edit or create
-  readonly createAt?: string // deprecated unUseful parameter from server
+  readonly createAt?: string // deprecated unUseful parameter from server,
 }
 
 export interface ReadMessage {

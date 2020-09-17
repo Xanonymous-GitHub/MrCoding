@@ -1,9 +1,8 @@
 import appStore from '@/store/app'
 import adminDataFetcher from "@/utils/adminDataFetcher";
 import {Route} from "vue-router";
-import {getLiffProfile, initializeLiff, isExternalBrowser, liffLogin} from "@/api/liff";
+import {getAccessToken, getLiffProfile, initializeLiff, isExternalBrowser, liffLogin} from "@/api/liff";
 import router from "@/router";
-// import liff from "@line/liff";
 
 const getLineUserProfile = async (): Promise<void> => {
   const liffProfile = await getLiffProfile()
@@ -39,15 +38,24 @@ export default async function autoLogin(route?: Route): Promise<void> {
       }
     } else if (route && 'chatroomId' in route.query) {
       const chatroomId = route.query['chatroomId']
-      await initializeLiff('1654852713-gR9j0RyE', async () => {
-        await getLineUserProfile()
-      })
+      // conclusion: the secondary liff.init is not success.
+      await initializeLiff('1654852713-gR9j0RyE', async () => await getLineUserProfile())
       await router.replace('/chatroom/' + chatroomId)
-      // window.location.replace('https://mrcoding.org/chatroom/' + chatroomId)
     } else {
-      console.log('will execute adminDataFetcher!')
-      // if the role is a admin
-      await adminDataFetcher()
+      if (isExternalBrowser()) {
+        // if the role is a admin
+        console.log('will execute adminDataFetcher!')
+        await adminDataFetcher()
+      } else {
+        try {
+          console.log('will execute getLineUserProfile!')
+          await initializeLiff('1654852713-gR9j0RyE')
+          appStore.ADD_LINE_ACCESS_TOKEN(getAccessToken() as string)
+          await getLineUserProfile()
+        } catch (e) {
+          console.log(`getLineUserProfile error ${e}`)
+        }
+      }
     }
   }
 }

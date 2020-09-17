@@ -13,7 +13,6 @@ import Avatar from '@/components/chatroom/msg/Avatar.vue'
 import MsgStatus from '@/components/chatroom/msg/MsgStatus.vue'
 import appStore from '@/store/app'
 import '@/assets/scss/components/chatroom/msg.scss'
-// import {Message, Admin} from '@/api/types/apiTypes'
 
 export default defineComponent({
   name: 'Msg',
