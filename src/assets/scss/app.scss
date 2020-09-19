@@ -15,4 +15,11 @@ body,
   -webkit-text-size-adjust: none;
   overscroll-behavior: contain;
   -ms-scroll-chaining: none;
+  scroll-behavior: smooth;
+}
+
+body {
+  .dark-background {
+    background-color: #272727;
+  }
 }

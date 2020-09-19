@@ -1,5 +1,6 @@
 <template>
-  <v-app id="chatroom" class="chat-room flex-column page-container">
+  <v-app id="chatroom" :class="{ 'chat-room--dark-background': isDarkMode }"
+         class="chat-room flex-column page-container">
     <MsgArea id="msg-area" :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode"/>
     <BottomController
         id="bottom-controller"
@@ -31,7 +32,15 @@ export default defineComponent({
   },
   setup(_, vm) {
     const data = reactive({
-      isDarkMode: computed(() => appStore.isDarkMode),
+      isDarkMode: computed(() => {
+        const colorMode = appStore.isDarkMode
+        if (colorMode) {
+          (document.querySelector('body') as HTMLBodyElement).classList.add('dark-background')
+        } else {
+          (document.querySelector('body') as HTMLBodyElement).classList.remove('dark-background')
+        }
+        return colorMode
+      }),
       currentChatRoomId: computed(() => appStore.getCurrentChatRoomId),
     })
 
@@ -65,6 +74,7 @@ export default defineComponent({
     const receiveNewMsg = async (): Promise<void> => {
       const newMsg = (await getLatestMessage(data.currentChatRoomId, appStore.getJwtKey as string)) as unknown as Message
       await appStore.createMsg({newMsg})
+      scrollMsgAreaToBottom()
     }
 
     const sendNewMsg = (newMsg: string): void => {
@@ -77,12 +87,13 @@ export default defineComponent({
       const messages = await getHistory(data.currentChatRoomId, Date.now(), 99999, appStore.getJwtKey as string) as unknown as Array<Message>
       for (const newMsg of messages.reverse()) {
         await appStore.createMsg({newMsg})
+        scrollMsgAreaToBottom()
       }
     }
 
-    const scrollMsgAreaToEnd = (): void => {
+    const scrollMsgAreaToBottom = (): void => {
       const msgArea = document.getElementById('msg-area') as HTMLDivElement
-      msgArea.scrollIntoView(false)
+      msgArea.scrollIntoView(false);
     }
 
     onMounted(async () => {
@@ -116,7 +127,7 @@ export default defineComponent({
 
     return {
       sendNewMsg,
-      scrollMsgAreaToEnd,
+      scrollMsgAreaToEnd: scrollMsgAreaToBottom,
       ...toRefs(data)
     }
   }

@@ -50,7 +50,13 @@ export default defineComponent({
       window
           .matchMedia('(prefers-color-scheme: dark)')
           .addEventListener('change', () => {
-            appStore.SET_THEME_MODE(detectTheme())
+            const theme = detectTheme()
+            appStore.SET_THEME_MODE(theme)
+            if (theme === ThemeModes.DARK) {
+              (document.querySelector('body') as HTMLBodyElement).classList.add('dark-background')
+            } else {
+              (document.querySelector('body') as HTMLBodyElement).classList.remove('dark-background')
+            }
           })
     })
 

@@ -1,20 +1,23 @@
 <template>
   <v-text-field
-      @keypress.enter.exact.prevent="sendMessage"
+      v-model="textContent"
+      autofocus
       class="msg-input"
+      clearable
       dense
       filled
       hide-details
       no-resize
-      placeholder="Put Some Messages"
+      placeholder="Aa"
       rounded
-      v-model="textContent"
+      @keypress.enter.exact.prevent="sendMessage"
+      @blur.prevent="null"
   >
     <template #prepend-inner>
       <v-icon>mdi-message-reply-text</v-icon>
     </template>
     <template #append-outer>
-      <v-btn :disabled="!textContent" @click.prevent="sendMessage" fab icon small>
+      <v-btn :disabled="!textContent" fab icon small @click.prevent="sendMessage">
         <v-icon>mdi-send</v-icon>
       </v-btn>
     </template>
@@ -43,7 +46,9 @@ export default defineComponent({
       textContent: ''
     })
 
-    const sendMessage = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sendMessage = (e: any) => {
+      e.preventDefault()
       const textContext = data.textContent.trim()
       data.textContent = ''
       emit('sendNewMsg', textContext)

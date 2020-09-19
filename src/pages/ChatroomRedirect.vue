@@ -18,9 +18,13 @@ export default defineComponent({
   name: "ChatroomRedirect",
   setup() {
     onMounted(async () => {
-      await autoLogin()
-      if (appStore.getUserType !== UserType.LIFFUSER) {
-        await router.replace('/')
+      try {
+        await autoLogin()
+        if (appStore.getUserType !== UserType.LIFFUSER) {
+          await router.replace('/')
+        }
+      } catch (e) {
+        alert(e)
       }
     })
     return
