@@ -13,12 +13,11 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onBeforeUnmount, onMounted, reactive, toRefs,} from '@vue/composition-api'
+import {computed, defineComponent, onBeforeUnmount, onMounted, reactive, toRefs} from '@vue/composition-api'
 import '@/assets/scss/pages/chatroom.scss'
 import appStore from '@/store/app'
-import {bindLineUserUidToChatroom, getChatRoom, getHistory, getLatestMessage, sendMessage} from "@/api/api";
-import {Admin, ChatRoom, LiffUser, Message, UserType} from "@/api/types/apiTypes";
-// import {VueRouter} from "vue-router/types/router";
+import {getChatRoom, getHistory, getLatestMessage, sendMessage} from "@/api/api";
+import {ChatRoom, Message} from "@/api/types/apiTypes";
 import MsgArea from "@/components/MsgArea.vue";
 import BottomController from "@/components/BottomController.vue";
 import {ioType} from "@/api/webSocketManager";
@@ -39,11 +38,9 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const webSocketException = (e: any): void => {
       alert(e.message)
-      console.log(e.message)
     }
 
     const setMsgAreaPadding = (msgArea: HTMLDivElement, bottomController: HTMLElement): void => {
-      // eslint-disable-next-line no-unused-expressions
       msgArea.setAttribute(
           'style',
           `padding-bottom:${bottomController.clientHeight + 10}px`
@@ -68,7 +65,6 @@ export default defineComponent({
     const receiveNewMsg = async (): Promise<void> => {
       const newMsg = (await getLatestMessage(data.currentChatRoomId, appStore.getJwtKey as string)) as unknown as Message
       await appStore.createMsg({newMsg})
-      console.log('received a message!')
     }
 
     const sendNewMsg = (newMsg: string): void => {
@@ -78,8 +74,10 @@ export default defineComponent({
     }
 
     const loadHistoryMessages = async () => {
-      const messages = await getHistory(data.currentChatRoomId, 1, 99999, appStore.getJwtKey as string) as unknown as Array<Message>
-      messages.forEach((newMsg: Message, insertPosition: number) => appStore.createMsg({newMsg, insertPosition}))
+      const messages = await getHistory(data.currentChatRoomId, Date.now(), 99999, appStore.getJwtKey as string) as unknown as Array<Message>
+      for (const newMsg of messages.reverse()) {
+        await appStore.createMsg({newMsg})
+      }
     }
 
     const scrollMsgAreaToEnd = (): void => {
@@ -88,11 +86,8 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      console.log('onMounted')
-
       // set the current chatroom identify
       const expectedChatRoomId = (vm.root.$route.params.chatroom as string) || ''
-      console.log('now is in roomNumber: ' + expectedChatRoomId)
 
       // validate the chatroom is exist or not.
       const chatRoom = (await getChatRoom(expectedChatRoomId)) as ChatRoom
@@ -110,29 +105,11 @@ export default defineComponent({
       setMsgAreaPadding(msgArea, bottomController)
       // load socketIO instance factory function after login
       await autoLogin()
-      const currentUser = appStore.getCurrentUser
-      if (currentUser && appStore.getUserType === UserType.LIFFUSER) {
-        await bindLineUserUidToChatroom(data.currentChatRoomId, currentUser._id)
-        console.log('bind -> ' + currentUser._id)
-      }
-
-      await appStore.createMsg({
-        newMsg: {
-          _id: 'test2',
-          author: (appStore.getCurrentUser as (LiffUser | Admin))._id,
-          read: false,
-          context: (appStore.getCurrentUser)?._id,
-          chatroomID: data.currentChatRoomId,
-          updateAt: 123456789
-        }
-      })
-
       await initializeWebSocket()
-      // await loadHistoryMessages()
+      await loadHistoryMessages()
     })
 
     onBeforeUnmount(() => {
-      console.log('onBeforeUnmount')
       appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
       document.dispatchEvent(new Event('BeforeUnmount'));
     })

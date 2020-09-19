@@ -2,7 +2,7 @@
   <div :class="{'msg--sent-by-self':sendBySelf}" class="msg pr-2 mb-1">
     <Avatar :avatar="owner.avatar" :is-dark-mode="isDarkMode" v-if="!sendBySelf"/>
     <MsgBox :context="msgSetup.context" :sent-by-self="sendBySelf"/>
-    <MsgStatus :read="msgSetup.read" :sent-by-self="sendBySelf" :sent-time="msgSetup.updateAt"/>
+    <MsgStatus :read="msgSetup.read" :sent-by-self="sendBySelf" :sent-time="msgSetup.updatedAt"/>
   </div>
 </template>
 

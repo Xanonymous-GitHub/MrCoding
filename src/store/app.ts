@@ -66,7 +66,6 @@ class AppStore extends VuexModule {
     } else {
       this.currentChatroomMessagesBox.push(newMsg)
     }
-    console.log(this.currentChatroomMessagesBox)
   }
   
   @Mutation

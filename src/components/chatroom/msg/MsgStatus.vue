@@ -21,7 +21,7 @@ export default defineComponent({
   props: {
     sentTime: {
       required: true,
-      type: String
+      type: Number
     },
     read: {
       required: true,
@@ -34,7 +34,7 @@ export default defineComponent({
   },
   setup(props) {
     const data = reactive({
-      formattedSentTime: computed(() => formatter(parseInt(props.sentTime)))
+      formattedSentTime: computed(() => formatter(props.sentTime))
     })
 
     return {

@@ -9,10 +9,10 @@ export interface LiffUser {
   readonly _id: string, // line uuid or admin mongo id.
   username: string, // admins' self-set name, or the line user's displayName.
   avatar?: string, // user avatar url (at the first time)
+  info?: string, // user profile
 }
 
 export interface Admin extends LiffUser {
-  info?: string, // user profile
   readonly cc: boolean // show that if the user is verified by us(dev team)
 }
 
@@ -27,8 +27,8 @@ export interface Message {
   read: boolean, // show that if this is read by someone (the other user in same chatroom)
   context?: string, // text content of this msg, will change to contain not only texts but also medias
   chatroomID: string, // the chatroom's [_id](mongoose id, absolutely unique)
-  updateAt: number, // the last time of edit or create
-  readonly createAt?: number // deprecated unUseful parameter from server,
+  updatedAt: number, // the last time of edit or create
+  readonly createdAt?: number // deprecated unUseful parameter from server,
 }
 
 export interface ReadMessage {
