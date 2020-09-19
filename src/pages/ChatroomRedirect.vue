@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <main class="page-container" id="chatroom-redirect">
+    <main id="chatroom-redirect" class="page-container">
       Redirect to chatroom ......
     </main>
   </v-app>
@@ -10,14 +10,18 @@
 import {defineComponent, onMounted} from '@vue/composition-api';
 import '@/assets/scss/pages/chatroom-redirect.scss';
 import autoLogin from "@/api/accountManager";
+import appStore from '@/store/app'
+import {UserType} from "@/api/types/apiTypes";
+import router from "@/router";
 
 export default defineComponent({
   name: "ChatroomRedirect",
-  setup(_, vm) {
-    onMounted(() => {
-      autoLogin(vm.root.$route)
-      // const route = vm.root.$route.query['liff.state'] as string
-      // console.log(route)
+  setup() {
+    onMounted(async () => {
+      await autoLogin()
+      if (appStore.getUserType !== UserType.LIFFUSER) {
+        await router.replace('/')
+      }
     })
     return
   }

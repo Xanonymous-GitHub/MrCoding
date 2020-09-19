@@ -1,15 +1,12 @@
 import io from 'socket.io-client';
 import appStore from "@/store/app";
-import {Admin, User} from "@/api/types/apiTypes";
 
 const isProduction = process.env.NODE_ENV === 'production'
 
-const getWebSocketExtraHeaders = (): { userID?: string, authorization?: string } => {
+const getWebSocketExtraHeaders = (): { Authorization?: string } => {
   const jwtKey = appStore.getJwtKey
-  const userID = (appStore.getCurrentUser as (User | Admin))._id
   return {
-    ...jwtKey && {Authorization: 'bearer ' + jwtKey},
-    ...userID && {userID}
+    ...jwtKey && {Authorization: 'bearer ' + jwtKey}
   }
 }
 

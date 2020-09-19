@@ -1,15 +1,15 @@
 import appStore from '@/store/app'
-import {Admin} from '@/api/types/apiTypes'
+import {Admin, LiffUser} from '@/api/types/apiTypes'
 import {getJwtTokenFromLocalStorage} from '@/utils/jwtTokenController'
 import {jwtSignIn} from "@/api/api";
 
 export default async function (key?: string): Promise<boolean> {
   const token = key || appStore.getJwtKey || await getJwtTokenFromLocalStorage()
   if (token) {
-    const admin = (await jwtSignIn(token)) as unknown as Admin
-    if (admin && !('statusCode' in admin) && ('_id' in admin)) {
+    const user = (await jwtSignIn(token)) as unknown as (Admin | LiffUser)
+    if (user && !('statusCode' in user) && ('_id' in user)) {
       await appStore.setCurrentUserJwtToken(token)
-      await appStore.setCurrentUser(admin)
+      await appStore.setCurrentUser(user)
       return true
     }
   }

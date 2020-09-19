@@ -1,31 +1,23 @@
 <template>
-  <v-app class="chat-room flex-column page-container" id="chatroom">
-    <MsgArea :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode" id="msg-area"/>
+  <v-app id="chatroom" class="chat-room flex-column page-container">
+    <MsgArea id="msg-area" :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode"/>
     <BottomController
+        id="bottom-controller"
         :current-chat-room-id="currentChatRoomId"
         :is-dark-mode="isDarkMode"
+        class="chat-room--bottom"
         @scrollMsgAreaToEnd="scrollMsgAreaToEnd"
         @sendNewMsg="sendNewMsg"
-        class="chat-room--bottom"
-        id="bottom-controller"
     />
   </v-app>
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  onMounted,
-  onBeforeUnmount,
-  reactive,
-  toRefs,
-} from '@vue/composition-api'
+import {computed, defineComponent, onBeforeUnmount, onMounted, reactive, toRefs,} from '@vue/composition-api'
 import '@/assets/scss/pages/chatroom.scss'
 import appStore from '@/store/app'
 import {bindLineUserUidToChatroom, getChatRoom, getHistory, getLatestMessage, sendMessage} from "@/api/api";
-import {Admin, ChatRoom, Message, User} from "@/api/types/apiTypes";
+import {Admin, ChatRoom, LiffUser, Message, UserType} from "@/api/types/apiTypes";
 // import {VueRouter} from "vue-router/types/router";
 import MsgArea from "@/components/MsgArea.vue";
 import BottomController from "@/components/BottomController.vue";
@@ -74,19 +66,19 @@ export default defineComponent({
     }
 
     const receiveNewMsg = async (): Promise<void> => {
-      const newMsg = (await getLatestMessage(data.currentChatRoomId, (appStore.getJwtKey || undefined), (appStore.getCurrentUser?._id || undefined))) as unknown as Message
+      const newMsg = (await getLatestMessage(data.currentChatRoomId, appStore.getJwtKey as string)) as unknown as Message
       await appStore.createMsg({newMsg})
       console.log('received a message!')
     }
 
     const sendNewMsg = (newMsg: string): void => {
       if (newMsg) {
-        sendMessage(data.currentChatRoomId, newMsg, (appStore.getJwtKey || undefined), (appStore.getCurrentUser?._id || undefined))
+        sendMessage(data.currentChatRoomId, newMsg, appStore.getJwtKey as string)
       }
     }
 
     const loadHistoryMessages = async () => {
-      const messages = await getHistory(data.currentChatRoomId, 1, 99999, (appStore.getJwtKey || undefined), (appStore.getCurrentUser?._id || undefined)) as unknown as Array<Message>
+      const messages = await getHistory(data.currentChatRoomId, 1, 99999, appStore.getJwtKey as string) as unknown as Array<Message>
       messages.forEach((newMsg: Message, insertPosition: number) => appStore.createMsg({newMsg, insertPosition}))
     }
 
@@ -119,29 +111,19 @@ export default defineComponent({
       // load socketIO instance factory function after login
       await autoLogin()
       const currentUser = appStore.getCurrentUser
-      if (currentUser && (!('cc' in currentUser)) && !chatRoom.liffUserID) {
-        await bindLineUserUidToChatroom(data.currentChatRoomId, currentUser?._id || '')
-        console.log('bind -> ' + currentUser?._id)
+      if (currentUser && appStore.getUserType === UserType.LIFFUSER) {
+        await bindLineUserUidToChatroom(data.currentChatRoomId, currentUser._id)
+        console.log('bind -> ' + currentUser._id)
       }
 
       await appStore.createMsg({
         newMsg: {
-          _id: 'test1',
-          author: (appStore.getCurrentUser as (User | Admin))._id,
-          read: false,
-          context: '123456',
-          chatroomID: data.currentChatRoomId,
-          updateAt: '123456789'
-        }
-      })
-      await appStore.createMsg({
-        newMsg: {
           _id: 'test2',
-          author: (appStore.getCurrentUser as (User | Admin))._id,
+          author: (appStore.getCurrentUser as (LiffUser | Admin))._id,
           read: false,
           context: (appStore.getCurrentUser)?._id,
           chatroomID: data.currentChatRoomId,
-          updateAt: '123456789'
+          updateAt: 123456789
         }
       })
 

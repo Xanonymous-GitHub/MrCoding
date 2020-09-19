@@ -10,33 +10,33 @@
 import appStore from '@/store/app'
 import "@/assets/scss/app.scss";
 import {defineComponent, onMounted} from '@vue/composition-api';
-import {themeModes} from '@/api/types/apiTypes'
+import {ThemeModes} from '@/api/types/apiTypes'
 
 export default defineComponent({
   name: "App",
   props: {},
   setup() {
-    const detectSystemTheme = (): themeModes => {
+    const detectSystemTheme = (): ThemeModes => {
       if (!window.matchMedia) {
-        return themeModes.LIGHT
+        return ThemeModes.LIGHT
       }
       const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)')
           .matches
-      return isDarkMode ? themeModes.DARK : themeModes.LIGHT
+      return isDarkMode ? ThemeModes.DARK : ThemeModes.LIGHT
     }
 
-    const detectLocalStorageTheme = (): themeModes => {
-      let colorSchema = `${window.localStorage.getItem('colorSchema')}` as themeModes
-      if (!(colorSchema in themeModes)) {
-        colorSchema = themeModes.AUTO
+    const detectLocalStorageTheme = (): ThemeModes => {
+      let colorSchema = `${window.localStorage.getItem('colorSchema')}` as ThemeModes
+      if (!(colorSchema in ThemeModes)) {
+        colorSchema = ThemeModes.AUTO
       }
       return colorSchema
     }
 
-    const detectTheme = (): themeModes => {
-      let theme: themeModes
+    const detectTheme = (): ThemeModes => {
+      let theme: ThemeModes
       const localStorageTheme = detectLocalStorageTheme()
-      if (localStorageTheme === themeModes.AUTO) {
+      if (localStorageTheme === ThemeModes.AUTO) {
         theme = detectSystemTheme()
       } else {
         theme = localStorageTheme

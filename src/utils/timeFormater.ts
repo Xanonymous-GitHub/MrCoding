@@ -8,5 +8,5 @@ export default function (time?: number | undefined): string {
   } else {
     minute = minute.toString()
   }
-  return (isAm ? hour : hour - 12) + ':' + minute.toString() + (isAm ? ' am' : ' pm')
+  return (isAm ? hour : (hour === 12 ? hour : hour - 12)) + ':' + minute.toString() + (isAm ? ' am' : ' pm')
 }

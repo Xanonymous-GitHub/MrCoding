@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {Response, ChatRoom, ResponseError, Message, ReadMessage, authResponse, Admin} from "@/api/types/apiTypes";
+import {Response, ChatRoom, ResponseError, Message, ReadMessage, authResponse, Admin, LiffUser} from "@/api/types/apiTypes";
 
 axios.defaults.baseURL = 'https://mrcoding.org/api'
 axios.defaults.headers.common['Content-Type'] = 'application/json;charset=utf-8'
@@ -13,13 +13,6 @@ const errorResolver = (e: any): ResponseError => {
       statusCode: e.status || 502,
       message: 'Unknown Error!'
     }
-  }
-}
-
-const dualIdentityHeaders = (jwtToken?: string, userID?: string) => {
-  return {
-    ...jwtToken && {Authorization: 'bearer ' + jwtToken},
-    ...userID && {userID}
   }
 }
 
@@ -60,10 +53,21 @@ export const setChatRoomClosingState = async (id: string, state: boolean, jwtTok
   }
 }
 
-export const getHistory = async (id: string, lastTime: number, queryAmount: number, jwtToken?: string, userID?: string): Response<Array<Message>> => {
+export const bindLineUserUidToChatroom = async (id: string, liffUserID: string): Response<ChatRoom> => {
+  try {
+    const {data} = await axios.patch(`/chatrooms/${id}/liffUserID`, {
+      liffUserID
+    })
+    return data
+  } catch (e) {
+    return errorResolver(e)
+  }
+}
+
+export const getHistory = async (id: string, lastTime: number, queryAmount: number, jwtToken: string): Response<Array<Message>> => {
   try {
     const {data} = await axios.get(`/chatrooms/${id}/history?lastTime=${lastTime}&number=${queryAmount}`, {
-      headers: dualIdentityHeaders(jwtToken, userID)
+      headers: {Authorization: 'bearer ' + jwtToken}
     })
     return data
   } catch (e) {
@@ -71,10 +75,10 @@ export const getHistory = async (id: string, lastTime: number, queryAmount: numb
   }
 }
 
-export const getLatestMessage = async (id: string, jwtToken?: string, userID?: string): Response<Message> => {
+export const getLatestMessage = async (id: string, jwtToken: string): Response<Message> => {
   try {
     const {data} = await axios.get(`/chatrooms/${id}/message`, {
-      headers: dualIdentityHeaders(jwtToken, userID)
+      headers: {Authorization: 'bearer ' + jwtToken}
     })
     return data
   } catch (e) {
@@ -82,12 +86,12 @@ export const getLatestMessage = async (id: string, jwtToken?: string, userID?: s
   }
 }
 
-export const sendMessage = async (id: string, context: string, jwtToken?: string, userID?: string): Response<Message> => {
+export const sendMessage = async (id: string, context: string, jwtToken: string): Response<Message> => {
   try {
     const {data} = await axios.post(`/chatrooms/${id}/message`, {
       context
     }, {
-      headers: dualIdentityHeaders(jwtToken, userID)
+      headers: {Authorization: 'bearer ' + jwtToken}
     })
     return data
   } catch (e) {
@@ -95,10 +99,10 @@ export const sendMessage = async (id: string, context: string, jwtToken?: string
   }
 }
 
-export const getLatestReadMessageId = async (id: string, jwtToken?: string, userID?: string): Response<ReadMessage> => {
+export const getLatestReadMessageId = async (id: string, jwtToken: string): Response<ReadMessage> => {
   try {
     const {data} = await axios.get(`/chatrooms/${id}/history/lastRead`, {
-      headers: dualIdentityHeaders(jwtToken, userID)
+      headers: {Authorization: 'bearer ' + jwtToken}
     })
     return data
   } catch (e) {
@@ -106,12 +110,12 @@ export const getLatestReadMessageId = async (id: string, jwtToken?: string, user
   }
 }
 
-export const sendReadMessageId = async (id: string, messageID: string, jwtToken?: string, userID?: string): Response<ReadMessage> => {
+export const sendReadMessageId = async (id: string, messageID: string, jwtToken: string): Response<ReadMessage> => {
   try {
     const {data} = await axios.patch(`/chatrooms/${id}/history/lastRead`, {
       messageID
     }, {
-      headers: dualIdentityHeaders(jwtToken, userID)
+      headers: {Authorization: 'bearer ' + jwtToken}
     })
     return data
   } catch (e) {
@@ -119,9 +123,9 @@ export const sendReadMessageId = async (id: string, messageID: string, jwtToken?
   }
 }
 
-export const auth = async (username: string, password: string): Response<authResponse> => {
+export const adminAuth = async (username: string, password: string): Response<authResponse> => {
   try {
-    const {data} = await axios.post('/auth', {
+    const {data} = await axios.post('/authAdmin', {
       username,
       password
     })
@@ -131,7 +135,18 @@ export const auth = async (username: string, password: string): Response<authRes
   }
 }
 
-export const getAllAdmins = async (jwtToken: string): Response<Array<Admin>> => {
+export const liffAuth = async (liffAccessToken: string): Response<authResponse> => {
+  try {
+    const {data} = await axios.post('/authLiff', {
+      liffAccessToken
+    })
+    return data
+  } catch (e) {
+    return errorResolver(e)
+  }
+}
+
+export const getAllUsers = async (jwtToken: string): Response<Array<Admin | LiffUser>> => {
   try {
     const {data} = await axios.get('/users', {
       headers: {
@@ -144,9 +159,22 @@ export const getAllAdmins = async (jwtToken: string): Response<Array<Admin>> => 
   }
 }
 
-export const getSpecificAdmin = async (adminID: string): Response<Admin> => {
+export const createAdmin = async (adminUserData: Admin, jwtToken: string): Response<Admin> => {
   try {
-    const {data} = await axios.get(`/users/${adminID}`)
+    const {data} = await axios.post('/users/admin', {...adminUserData}, {
+      headers: {
+        Authorization: 'bearer ' + jwtToken
+      }
+    })
+    return data
+  } catch (e) {
+    return errorResolver(e)
+  }
+}
+
+export const getSpecificUser = async (id: string): Response<Admin | LiffUser> => {
+  try {
+    const {data} = await axios.get(`/users/${id}`)
     return data
   } catch (e) {
     return errorResolver(e)
@@ -168,7 +196,7 @@ export const changeAdminInfo = async (adminID: string, info: string, jwtToken: s
   }
 }
 
-export const changeAvatar = async (adminID: string, avatar: string, jwtToken: string): Response<Admin> => {
+export const changeAdminAvatar = async (adminID: string, avatar: string, jwtToken: string): Response<Admin> => {
   try {
     const {data} = await axios.patch(`/users/${adminID}/avatar`, {
       avatar
@@ -183,9 +211,11 @@ export const changeAvatar = async (adminID: string, avatar: string, jwtToken: st
   }
 }
 
-export const jwtSignIn = async (jwtToken: string): Response<Admin> => {
+export const changeAdminCC = async (adminID: string, cc: boolean, jwtToken: string): Response<Admin> => {
   try {
-    const {data} = await axios.get('/me', {
+    const {data} = await axios.patch(`/users/${adminID}/cc`, {
+      cc
+    }, {
       headers: {
         Authorization: 'bearer ' + jwtToken
       }
@@ -196,10 +226,12 @@ export const jwtSignIn = async (jwtToken: string): Response<Admin> => {
   }
 }
 
-export const bindLineUserUidToChatroom = async (id: string, liffUserID: string): Response<ChatRoom> => {
+export const jwtSignIn = async (jwtToken: string): Response<Admin | LiffUser> => {
   try {
-    const {data} = await axios.patch(`/chatrooms/${id}/liffUserID`, {
-      liffUserID
+    const {data} = await axios.get('/me', {
+      headers: {
+        Authorization: 'bearer ' + jwtToken
+      }
     })
     return data
   } catch (e) {

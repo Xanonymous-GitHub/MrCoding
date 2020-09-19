@@ -12,16 +12,8 @@ export const initializeLiff = async (myLiffId: string, successCallback?: (() => 
   await liff.ready;
 }
 
-export const liffLogin = async (redirectUri?: string | undefined): Promise<void> => {
-  if (!liff.isLoggedIn()) {
-    await liff.login({redirectUri})
-  }
-}
-
 export const getLiffProfile = async (): Promise<Profile> => {
-  const profile = await liff.getProfile()
-  console.log('userprofile is : ' + profile)
-  return profile;
+  return await liff.getProfile();
 }
 
 export const isExternalBrowser = (): boolean => {
@@ -29,5 +21,7 @@ export const isExternalBrowser = (): boolean => {
 }
 
 export const getAccessToken = (): (string | null) => {
-  return liff.getAccessToken();
+  return liff.getAccessToken()
 }
+
+export const liffId = '1654852713-gR9j0RyE'

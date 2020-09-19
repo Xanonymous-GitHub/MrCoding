@@ -1,20 +1,21 @@
 import {Action, Module, Mutation, VuexModule, getModule} from 'vuex-module-decorators'
-import {Message, themeModes, Admin, User} from '@/api/types/apiTypes'
+import {Message, ThemeModes, Admin, LiffUser, UserType} from '@/api/types/apiTypes'
 import getBase64ImgPath from '@/utils/requestAvatar'
-import {getSpecificAdmin} from '@/api/api'
+import {getSpecificUser} from '@/api/api'
 import store from '@/store/index'
 
 @Module({name: 'app', stateFactory: true, namespaced: true, store, dynamic: true})
 class AppStore extends VuexModule {
-  private themeMode = themeModes.AUTO;
+  private themeMode = ThemeModes.AUTO;
+  private userType = UserType.UNKNOWN;
   
-  private currentUser: Admin | User = {
+  private currentUser: Admin | LiffUser = {
     _id: '',
     username: '',
     avatar: ''
   }
   
-  private otherUsers: Array<Admin | User> = [
+  private otherUsers: Array<Admin | LiffUser> = [
     {
       _id: '',
       username: '',
@@ -31,9 +32,7 @@ class AppStore extends VuexModule {
   
   private sendingLogInRequest = false
   
-  private lineAccessToken = ''
-  
-  private static async newUser(originalData: User | Admin): Promise<User | Admin> {
+  private static async newUser(originalData: LiffUser | Admin): Promise<LiffUser | Admin> {
     if (originalData && 'avatar' in originalData && originalData.avatar) {
       originalData.avatar = await getBase64ImgPath(originalData.avatar)
     }
@@ -41,23 +40,23 @@ class AppStore extends VuexModule {
   }
   
   @Mutation
-  SET_THEME_MODE(mode: themeModes): void {
+  SET_THEME_MODE(mode: ThemeModes): void {
     this.themeMode = mode
   }
   
   @Mutation
-  SET_CURRENT_USER(originalData: User | Admin): void {
+  SET_USER_TYPE(type: UserType): void {
+    this.userType = type
+  }
+  
+  @Mutation
+  SET_CURRENT_USER(originalData: LiffUser | Admin): void {
     this.currentUser = originalData
   }
   
   @Mutation
-  ADD_OTHER_USER(otherUser: User | Admin): void {
+  ADD_OTHER_USER(otherUser: LiffUser | Admin): void {
     this.otherUsers.push(otherUser)
-  }
-  
-  @Mutation
-  ADD_LINE_ACCESS_TOKEN(token: string): void {
-    this.lineAccessToken = token
   }
   
   @Mutation
@@ -93,10 +92,10 @@ class AppStore extends VuexModule {
   @Action({commit: 'CREATE_MSG'})
   async createMsg({newMsg, insertPosition}: { newMsg: Message, insertPosition?: (number | undefined) }): Promise<{ newMsg: Message, insertPosition?: (number | undefined) }> {
     const currentUser = this.getCurrentUser
-    if (newMsg.author !== (currentUser as (Admin | User))._id) {
+    if (newMsg.author !== (currentUser as (Admin | LiffUser))._id) {
       let otherUser = this.getOtherUsers.find(user => user._id === newMsg.author)
       if (!otherUser) {
-        otherUser = (await getSpecificAdmin(newMsg.author)) as unknown as Admin
+        otherUser = (await getSpecificUser(newMsg.author)) as unknown as (Admin | LiffUser)
         if (otherUser) {
           await this.addOtherUser(otherUser)
         }
@@ -106,12 +105,12 @@ class AppStore extends VuexModule {
   }
   
   @Action({commit: 'SET_CURRENT_USER'})
-  async setCurrentUser(originalData: User | Admin): Promise<User | Admin> {
+  async setCurrentUser(originalData: LiffUser | Admin): Promise<LiffUser | Admin> {
     return await AppStore.newUser(originalData)
   }
   
   @Action({commit: 'ADD_OTHER_USER'})
-  async addOtherUser(originalData: User | Admin): Promise<User | Admin> {
+  async addOtherUser(originalData: LiffUser | Admin): Promise<LiffUser | Admin> {
     return await AppStore.newUser(originalData)
   }
   
@@ -121,18 +120,22 @@ class AppStore extends VuexModule {
   }
   
   get isDarkMode(): boolean {
-    return this.themeMode === themeModes.DARK
+    return this.themeMode === ThemeModes.DARK
+  }
+  
+  get getUserType(): UserType {
+    return this.userType
   }
   
   get getMessage(): Array<Message> {
     return this.currentChatroomMessagesBox
   }
   
-  get getCurrentUser(): (Admin | User) | undefined {
+  get getCurrentUser(): (Admin | LiffUser) | undefined {
     return this.currentUser
   }
   
-  get getOtherUsers(): Array<Admin | User> {
+  get getOtherUsers(): Array<Admin | LiffUser> {
     return this.otherUsers
   }
   
@@ -150,10 +153,6 @@ class AppStore extends VuexModule {
   
   get isSendingLogInRequest(): boolean {
     return this.sendingLogInRequest
-  }
-  
-  get getLineAccessToken(): string {
-    return this.lineAccessToken
   }
 }
 

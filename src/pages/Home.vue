@@ -77,9 +77,9 @@ import {
   ComputedRef,
 } from '@vue/composition-api';
 import appStore from '@/store/app'
-import adminDataFetcher from '@/utils/adminDataFetcher'
+import getUserDataByJwtToken from '@/utils/jwtService'
 import {setJwtToLocalStorageWithExpire} from '@/utils/jwtTokenController'
-import {auth} from "@/api/api"
+import {adminAuth} from "@/api/api"
 import '@/assets/scss/pages/home.scss'
 import {authResponse} from "@/api/types/apiTypes";
 import autoLogin from "@/api/accountManager";
@@ -122,12 +122,11 @@ export default defineComponent({
       if (data.username.trim() && data.password.trim()) {
         data.loginInProgress = true
         startInput()
-        const {token} = (await auth(data.username, data.password)) as authResponse
+        const {token} = (await adminAuth(data.username, data.password)) as authResponse
         data.password = ''
         if (token) {
-          if (await adminDataFetcher(token)) {
+          if (await getUserDataByJwtToken(token)) {
             await setJwtToLocalStorageWithExpire(token)
-            appStore.setCurrentUserJwtToken(token)
             startInput()
           } else {
             data.loginStatusMessages = 'jwt validation failed'
