@@ -1,12 +1,13 @@
 <template>
   <div class="msg-status">
     <p
-        class="msg-status__text px-0 py-0 mb-0 mx-2"
         v-if="read && sentBySelf"
+        class="msg-status__text px-0 py-0 mb-0 mx-2"
     >
-      read
+      已讀
     </p>
-    <p class="msg-status__text px-0 py-0 mb-0 mx-2">
+    <p :class="{'msg-status__text--right':sentBySelf,'msg-status__text--left':!sentBySelf}"
+       class="msg-status__text px-0 py-0 mb-0 mx-2">
       {{ formattedSentTime }}
     </p>
   </div>

@@ -4,13 +4,13 @@ $msg-box-background-color-from-other: #0779e4;
 @mixin msg-box {
   .msg-box {
     width: fit-content;
-    border-radius: 20px;
+    border-radius: 15px 15px 5px 15px;
     font-weight: bolder;
     max-width: min(500px, 70%);
     background-color: $msg-box-background-color;
     color: white;
     cursor: default;
-    box-shadow: 2px 2px 8px -1px rgba(0, 0, 0, 0.75);
+    box-shadow: 2px 2px 8px -1px rgba(0, 0, 0, 0.5);
     word-break: break-word;
 
     &:hover {
@@ -20,6 +20,7 @@ $msg-box-background-color-from-other: #0779e4;
 
     @at-root &--from-other {
       background-color: $msg-box-background-color-from-other;
+      border-radius: 15px;
 
       &:hover {
         transition: 0.3s;

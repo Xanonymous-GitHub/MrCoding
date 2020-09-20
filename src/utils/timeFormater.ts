@@ -1,12 +1,31 @@
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-tw'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import isYesterday from 'dayjs/plugin/isYesterday'
+import isToday from 'dayjs/plugin/isToday'
+
+dayjs.extend(isToday)
+dayjs.extend(isYesterday)
+dayjs.extend(customParseFormat)
+dayjs.locale('zh-tw')
+
 export default function (time?: number | undefined): string {
-  const clientTime = new Date(time || Date.now())
-  const isAm = clientTime.getHours() < 12
-  const hour = clientTime.getHours()
-  let minute: (number | string) = clientTime.getMinutes()
-  if (minute < 10) {
-    minute = '0' + minute.toString()
-  } else {
-    minute = minute.toString()
+  const now = dayjs()
+  const product = dayjs(time)
+  let year: string | undefined
+  const yearDistance = now.year() - product.year()
+  switch (yearDistance) {
+    case 0:
+      year = undefined
+      break
+    case 1:
+      year = '去年'
+      break
+    default:
+      year = product.format('YYYY年')
+      break
   }
-  return (isAm ? hour : (hour === 12 ? hour : hour - 12)) + ':' + minute.toString() + (isAm ? ' am' : ' pm')
+  const monthAndDay = product.isToday() ? undefined : (product.isYesterday() ? '昨天' : product.format('M月D日'))
+  const hourAndMinute = product.format('h:mm a')
+  return [year ? (year + monthAndDay) : monthAndDay, hourAndMinute].join('\n')
 }

@@ -34,6 +34,7 @@
     "@vue/eslint-config-typescript": "^5.1.0",
     "autoprefixer": "^9.8.6",
     "cssnano": "^4.1.10",
+    "dayjs": "^1.8.36",
     "eslint": "^7.9.0",
     "eslint-plugin-vue": "^6.2.2",
     "lax.js": "^1.2.5",
