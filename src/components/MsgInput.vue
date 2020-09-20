@@ -1,5 +1,6 @@
 <template>
   <v-text-field
+      id="msgInput"
       v-model="textContent"
       autofocus
       class="msg-input"
@@ -17,7 +18,7 @@
       <v-icon>mdi-message-reply-text</v-icon>
     </template>
     <template #append-outer>
-      <v-btn :disabled="!textContent" fab icon small @click.prevent="sendMessage">
+      <v-btn :disabled="!textContent" fab icon small @click.prevent="sendMessage($event)">
         <v-icon>mdi-send</v-icon>
       </v-btn>
     </template>
@@ -47,8 +48,11 @@ export default defineComponent({
     })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sendMessage = (e: any) => {
+    function sendMessage(e: any) {
+      (document.getElementById('msgInput') as HTMLInputElement).focus()
       e.preventDefault()
+      e.stopPropagation()
+      e.stopImmediatePropagation()
       const textContext = data.textContent.trim()
       data.textContent = ''
       emit('sendNewMsg', textContext)
