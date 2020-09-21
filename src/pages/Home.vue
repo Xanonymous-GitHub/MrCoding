@@ -138,10 +138,10 @@ export default defineComponent({
       data.loginInProgress = false
     }
 
-    onMounted(() => {
+    onMounted(async () => {
       startInput()
       document.dispatchEvent(new Event('app-rendered'));
-      autoLogin()
+      await autoLogin()
     })
 
     return {
