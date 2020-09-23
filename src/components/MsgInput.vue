@@ -1,5 +1,5 @@
 <template>
-  <v-text-field
+  <VTextField
       id="msgInput"
       v-model="textContent"
       autofocus
@@ -12,30 +12,35 @@
       placeholder="Aa"
       rounded
       @keypress.enter.exact.prevent="sendMessage"
-      @blur.prevent="null"
   >
     <template #prepend-inner>
-      <v-icon>mdi-message-reply-text</v-icon>
+      <VIcon>mdi-message-reply-text</VIcon>
     </template>
     <template #append-outer>
-      <v-btn :disabled="!textContent" fab icon small @click.prevent="sendMessage($event)">
-        <v-icon>mdi-send</v-icon>
-      </v-btn>
+      <VBtn :disabled="!textContent" fab icon small @click.prevent="sendMessage($event)">
+        <VIcon>mdi-send</VIcon>
+      </VBtn>
     </template>
     <template #prepend>
-      <v-btn fab icon small>
-        <v-icon>mdi-plus-circle</v-icon>
-      </v-btn>
+      <VBtn fab icon small>
+        <VIcon>mdi-plus-circle</VIcon>
+      </VBtn>
     </template>
-  </v-text-field>
+  </VTextField>
 </template>
 
 <script lang="ts">
 import {defineComponent, reactive, toRefs} from '@vue/composition-api'
 import '@/assets/scss/components/chatroom/msg-input.scss'
+import {VIcon, VTextField, VBtn} from 'vuetify/lib';
 
 export default defineComponent({
   name: 'MsgInput',
+  components: {
+    VIcon,
+    VTextField,
+    VBtn
+  },
   props: {
     currentChatRoomId: {
       required: true,

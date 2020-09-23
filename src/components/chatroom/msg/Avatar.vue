@@ -1,22 +1,27 @@
 <template>
-  <v-avatar class="mx-2" size="24px">
-    <v-icon :dark="isDarkMode" v-if="!avatar">
+  <VAvatar class="mx-2" size="24px">
+    <VIcon v-if="!avatar" :dark="isDarkMode">
       mdi-account-circle
-    </v-icon>
+    </VIcon>
     <img
+        v-if="avatar"
         :src="avatar"
         alt="Avatar"
         class="avatar"
-        v-if="avatar"
     >
-  </v-avatar>
+  </VAvatar>
 </template>
 
 <script lang="ts">
 import {defineComponent} from '@vue/composition-api'
+import {VAvatar, VIcon} from 'vuetify/lib';
 
 export default defineComponent({
   name: 'Avatar',
+  components: {
+    VAvatar,
+    VIcon
+  },
   props: {
     avatar: {
       required: false,

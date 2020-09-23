@@ -2,15 +2,6 @@
 
 @include _page('chatroom') {
   .chat-room {
-
-    &--bottom {
-      bottom: 0;
-    }
-
-    &--fixed {
-      position: fixed;
-    }
-
     &--dark-background {
       background-color: #272727;
     }

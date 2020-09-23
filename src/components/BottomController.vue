@@ -1,11 +1,11 @@
 <template>
-  <v-app-bar :dark="isDarkMode" app bottom>
+  <VAppBar id="bottom-controller" :dark="isDarkMode">
     <MsgInput
         :current-chat-room-id="currentChatRoomId"
         @scrollMsgAreaToEnd="scrollMsgAreaToEnd"
         @sendNewMsg="sendNewMsg"
     />
-  </v-app-bar>
+  </VAppBar>
 </template>
 
 <script lang="ts">
@@ -13,11 +13,13 @@ import {defineComponent} from '@vue/composition-api'
 import MsgInput from "@/components/MsgInput.vue";
 import {Message} from '@/api/types/apiTypes'
 import '@/assets/scss/components/chatroom/bottom-controller.scss'
+import {VAppBar} from 'vuetify/lib';
 
 export default defineComponent({
   name: 'BottomController',
   components: {
-    MsgInput
+    MsgInput,
+    VAppBar
   },
   props: {
     isDarkMode: {

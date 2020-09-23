@@ -1,6 +1,7 @@
 @mixin bottom-controller {
-  .bottom-controller {
+  #bottom-controller {
     position: fixed;
+    bottom: 0;
   }
 }
 

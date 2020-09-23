@@ -1,69 +1,69 @@
 <template>
-  <v-app class="home-page">
-    <main class="page-container" id="home">
+  <VApp class="home-page">
+    <main id="home" class="page-container">
       <div class="main-field">
         <h1 class="main-field__title">
           mr.coding
         </h1>
-        <v-form id="form" ref="form" v-model="valid">
-          <div class="main-field__login-field" v-if="!logged">
-            <v-text-field
+        <VForm id="form" ref="form" v-model="valid">
+          <div v-if="!logged" class="main-field__login-field">
+            <VTextField
+                v-model="username"
                 :disabled="loginInProgress"
                 :rules="loginRules"
-                @input="startInput"
-                @keypress.enter.prevent="login"
                 dense
                 label="username"
                 outlined
                 required
                 solo-inverted
-                v-model="username"
-            />
-            <v-text-field
-                :disabled="loginInProgress"
-                :rules="loginRules"
                 @input="startInput"
                 @keypress.enter.prevent="login"
+            />
+            <VTextField
+                v-model="password"
+                :disabled="loginInProgress"
+                :rules="loginRules"
                 dense
                 label="password"
                 outlined
                 required
                 solo-inverted
                 type="password"
-                v-model="password"
+                @input="startInput"
+                @keypress.enter.prevent="login"
             />
             <p>{{ loginStatusMessages }}</p>
             <div class="main-field__buttons">
-              <v-btn
+              <VBtn
                   :disabled="!password||!username||loginInProgress"
-                  @click.exact.prevent.stop="login"
                   color="success"
                   small
+                  @click.exact.prevent.stop="login"
               >
                 LOGIN
-              </v-btn>
+              </VBtn>
             </div>
           </div>
-        </v-form>
-        <div class="main-field__chatroom-selection-field" v-if="logged">
-          <v-text-field
-              @keypress.enter.prevent="chatroomToGo.trim()&&$router.push(getWhereToGo.toString())"
+        </VForm>
+        <div v-if="logged" class="main-field__chatroom-selection-field">
+          <VTextField
+              v-model="chatroomToGo"
               dense
               label="chatroom ID"
               outlined
               required
               solo-inverted
-              v-model="chatroomToGo"
+              @keypress.enter.prevent="chatroomToGo.trim()&&$router.push(getWhereToGo.toString())"
           />
           <div class="main-field__buttons">
-            <v-btn :disabled="!chatroomToGo" :to="getWhereToGo" color="primary" small>
+            <VBtn :disabled="!chatroomToGo" :to="getWhereToGo" color="primary" small>
               GO THIS ROOM
-            </v-btn>
+            </VBtn>
           </div>
         </div>
       </div>
     </main>
-  </v-app>
+  </VApp>
 </template>
 
 <script lang="ts">
@@ -83,10 +83,17 @@ import {adminAuth} from "@/api/api"
 import '@/assets/scss/pages/home.scss'
 import {authResponse} from "@/api/types/apiTypes";
 import autoLogin from "@/api/accountManager";
+import {VApp, VForm, VTextField, VBtn} from 'vuetify/lib';
 
 export default defineComponent({
   name: "Home",
   props: {},
+  components: {
+    VApp,
+    VForm,
+    VTextField,
+    VBtn
+  },
   setup() {
     // In vue2 + composition API, 'this' is alias to 'vm.root'
     const loginRules = [

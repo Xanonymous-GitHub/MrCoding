@@ -1,16 +1,16 @@
 <template>
-  <v-app>
-    <main class="page-container" id="dashboard">
+  <VApp>
+    <main id="dashboard" class="page-container">
       <div class="dashboard-field">
         <div class="chatroom-list">
-          <a :href="'/chatroom/'+chatroom._id" :key="key" class="chatroom"
-             rel="noreferrer noopener" target="_blank" v-for="(chatroom, key) in chatroomBundle">
+          <a v-for="(chatroom, key) in chatroomBundle" :key="key" :href="'/chatroom/'+chatroom._id"
+             class="chatroom" rel="noreferrer noopener" target="_blank">
             {{ chatroom._id }}
           </a>
         </div>
       </div>
     </main>
-  </v-app>
+  </VApp>
 </template>
 
 <script lang="ts">
@@ -20,9 +20,13 @@ import {getAllChatRooms} from "@/api/api";
 import {ChatRoom} from "@/api/types/apiTypes";
 import appStore from '@/store/app'
 import autoLogin from "@/api/accountManager";
+import {VApp} from 'vuetify/lib';
 
 export default defineComponent({
   name: "Dashboard",
+  components: {
+    VApp
+  },
   setup() {
     const data = reactive({
       chatroomBundle: [] as Array<ChatRoom>

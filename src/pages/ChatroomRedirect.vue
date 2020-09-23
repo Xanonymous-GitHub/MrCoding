@@ -1,9 +1,9 @@
 <template>
-  <v-app>
+  <VApp>
     <main id="chatroom-redirect" class="page-container">
       Redirect to chatroom ......
     </main>
-  </v-app>
+  </VApp>
 </template>
 
 <script lang="ts">
@@ -13,9 +13,13 @@ import autoLogin from "@/api/accountManager";
 import appStore from '@/store/app'
 import {UserType} from "@/api/types/apiTypes";
 import router from "@/router";
+import {VApp} from 'vuetify/lib';
 
 export default defineComponent({
   name: "ChatroomRedirect",
+  components: {
+    VApp
+  },
   setup() {
     onMounted(async () => {
       try {

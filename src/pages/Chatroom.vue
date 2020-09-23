@@ -1,5 +1,5 @@
 <template>
-  <v-app id="chatroom" :class="{ 'chat-room--dark-background': isDarkMode }"
+  <VApp id="chatroom" :class="{ 'chat-room--dark-background': isDarkMode }"
          class="chat-room flex-column page-container">
     <MsgArea id="msg-area" :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode"/>
     <BottomController
@@ -10,7 +10,7 @@
         @scrollMsgAreaToEnd="scrollMsgAreaToEnd"
         @sendNewMsg="sendNewMsg"
     />
-  </v-app>
+  </VApp>
 </template>
 
 <script lang="ts">
@@ -23,12 +23,14 @@ import MsgArea from "@/components/MsgArea.vue";
 import BottomController from "@/components/BottomController.vue";
 import {ioType} from "@/api/webSocketManager";
 import autoLogin from "@/api/accountManager";
+import {VApp} from 'vuetify/lib';
 
 export default defineComponent({
   name: "ChatRoom",
   components: {
     MsgArea,
-    BottomController
+    BottomController,
+    VApp
   },
   setup(_, vm) {
     const data = reactive({
