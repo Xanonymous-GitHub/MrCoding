@@ -9,11 +9,12 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from '@vue/composition-api'
+import {defineComponent, onMounted} from '@vue/composition-api'
 import MsgInput from "@/components/chatroom/MsgInput.vue";
 import {Message} from '@/api/types/apiTypes'
 import '@/assets/scss/components/chatroom/bottom-controller.scss'
 import {VAppBar} from 'vuetify/lib';
+import {isExternalBrowser} from "@/api/liffUserService";
 
 export default defineComponent({
   name: 'BottomController',
@@ -39,6 +40,13 @@ export default defineComponent({
     const sendNewMsg = (newMsg: Message) => {
       emit('sendNewMsg', newMsg)
     }
+
+    onMounted(() => {
+      if (!isExternalBrowser()) {
+        const appBar = document.getElementById('bottom-controller') as HTMLDivElement
+        appBar.style.setProperty('height', '70px')
+      }
+    })
 
     return {
       scrollMsgAreaToEnd,

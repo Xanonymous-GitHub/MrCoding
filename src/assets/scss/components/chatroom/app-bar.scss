@@ -1,7 +1,7 @@
 @mixin app-bar {
   #app-bar {
     position: fixed;
-    top: 0;
+    top: -2px;
     user-select: none;
     cursor: default;
     font-weight: bolder;

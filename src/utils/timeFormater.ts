@@ -18,14 +18,11 @@ export default function (time?: number | undefined): string {
     case 0:
       year = undefined
       break
-    case 1:
-      year = '去年'
-      break
     default:
-      year = product.format('YYYY年')
+      year = product.format('YYYY/')
       break
   }
-  const monthAndDay = product.isToday() ? undefined : (product.isYesterday() ? '昨天' : product.format('M月D日'))
+  const monthAndDay = product.isToday() ? undefined : (product.isYesterday() ? '昨天' : product.format('M/D'))
   const hourAndMinute = product.format('h:mm a')
   return [year ? (year + monthAndDay) : monthAndDay, hourAndMinute].join('\n')
 }
