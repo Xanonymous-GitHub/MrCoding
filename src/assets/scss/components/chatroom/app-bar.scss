@@ -1,0 +1,13 @@
+@mixin app-bar {
+  #app-bar {
+    position: fixed;
+    top: 0;
+    user-select: none;
+    cursor: default;
+    font-weight: bolder;
+    z-index: 9999999;
+    height: min-content;
+  }
+}
+
+@include app-bar;

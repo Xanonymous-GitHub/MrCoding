@@ -1,9 +1,11 @@
 @import "../shared/container";
+@import "../shared/mixin";
 
 @include _page('chatroom') {
   .chat-room {
     &--dark-background {
       background-color: #272727;
     }
+    @include fix-100vh-in-mobile-WebKit;
   }
 }

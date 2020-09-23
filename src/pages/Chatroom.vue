@@ -1,9 +1,9 @@
 <template>
   <VApp id="chatroom" :class="{ 'chat-room--dark-background': isDarkMode }"
-         class="chat-room flex-column page-container">
+        class="chat-room flex-column page-container">
+    <AppBar :is-dark-mode="isDarkMode"/>
     <MsgArea id="msg-area" :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode"/>
     <BottomController
-        id="bottom-controller"
         :current-chat-room-id="currentChatRoomId"
         :is-dark-mode="isDarkMode"
         class="chat-room--bottom"
@@ -21,6 +21,7 @@ import {getChatRoom, getHistory, getLatestMessage, sendMessage} from "@/api/api"
 import {ChatRoom, Message} from "@/api/types/apiTypes";
 import MsgArea from "@/components/chatroom/MsgArea.vue";
 import BottomController from "@/components/chatroom/BottomController.vue";
+import AppBar from "@/components/chatroom/AppBar.vue";
 import {ioType} from "@/api/webSocketManager";
 import autoLogin from "@/api/accountManager";
 import {VApp} from 'vuetify/lib';
@@ -30,7 +31,8 @@ export default defineComponent({
   components: {
     MsgArea,
     BottomController,
-    VApp
+    VApp,
+    AppBar
   },
   setup(_, vm) {
     const data = reactive({
@@ -51,12 +53,15 @@ export default defineComponent({
       alert(e.message)
     }
 
-    const setMsgAreaPadding = (msgArea: HTMLDivElement, bottomController: HTMLElement): void => {
+    const setMsgAreaPadding = (msgArea: HTMLDivElement, bottomController: HTMLElement, appBar: HTMLDivElement): void => {
+      const attributeList = [
+        `padding-top:${appBar.clientHeight}px`,
+        `padding-bottom:${bottomController.clientHeight + 10}px`
+      ]
       msgArea.setAttribute(
           'style',
-          `padding-bottom:${bottomController.clientHeight + 10}px`
+          attributeList.join(';').toString()
       );
-      return
     }
 
     const chatroomJoined = (): void => {
@@ -114,8 +119,9 @@ export default defineComponent({
 
       const msgArea = document.getElementById('msg-area') as HTMLDivElement
       const bottomController = document.getElementById('bottom-controller') as HTMLElement
+      const appBar = document.getElementById('app-bar') as HTMLDivElement
       // modify the chatroom size to adapt the screen
-      setMsgAreaPadding(msgArea, bottomController)
+      setMsgAreaPadding(msgArea, bottomController, appBar)
       // load socketIO instance factory function after login
       await autoLogin()
       await initializeWebSocket()

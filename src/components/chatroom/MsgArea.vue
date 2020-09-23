@@ -1,7 +1,7 @@
 <template>
   <div
       :class="{ 'msg-area--dark-background': isDarkMode }"
-      class="msg-area msg-area--full-height"
+      class="msg-area"
   >
     <Msg
         :is-dark-mode="isDarkMode"
