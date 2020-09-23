@@ -19,8 +19,8 @@ import '@/assets/scss/pages/chatroom.scss'
 import appStore from '@/store/app'
 import {getChatRoom, getHistory, getLatestMessage, sendMessage} from "@/api/api";
 import {ChatRoom, Message} from "@/api/types/apiTypes";
-import MsgArea from "@/components/MsgArea.vue";
-import BottomController from "@/components/BottomController.vue";
+import MsgArea from "@/components/chatroom/MsgArea.vue";
+import BottomController from "@/components/chatroom/BottomController.vue";
 import {ioType} from "@/api/webSocketManager";
 import autoLogin from "@/api/accountManager";
 import {VApp} from 'vuetify/lib';

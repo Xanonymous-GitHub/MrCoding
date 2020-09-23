@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import {defineComponent, reactive, toRefs, computed} from '@vue/composition-api'
-import Msg from "@/components/Msg.vue";
+import Msg from "@/components/chatroom/Msg.vue";
 import appStore from '@/store/app'
 import '@/assets/scss/components/chatroom/msg-area.scss'
 

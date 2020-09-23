@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import {defineComponent} from '@vue/composition-api'
-import MsgInput from "@/components/MsgInput.vue";
+import MsgInput from "@/components/chatroom/MsgInput.vue";
 import {Message} from '@/api/types/apiTypes'
 import '@/assets/scss/components/chatroom/bottom-controller.scss'
 import {VAppBar} from 'vuetify/lib';
