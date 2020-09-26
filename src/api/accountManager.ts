@@ -17,7 +17,7 @@ export default async function autoLogin(): Promise<void> {
         
         // fetch the accessToken of this line user.
         const lineAccessToken = getAccessToken() as string
-        
+
         // if get the accessToken successfully, confirm this is a liffuser.
         appStore.SET_USER_TYPE(UserType.LIFFUSER)
         

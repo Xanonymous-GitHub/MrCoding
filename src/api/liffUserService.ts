@@ -8,7 +8,7 @@ export interface Profile {
 }
 
 export const initializeLiff = async (myLiffId: string, successCallback?: (() => void)): Promise<void> => {
-  await liff.init({liffId: myLiffId}, successCallback);
+  await liff.init({liffId: myLiffId}, successCallback)
   await liff.ready;
 }
 

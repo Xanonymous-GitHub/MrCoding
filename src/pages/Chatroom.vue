@@ -17,7 +17,7 @@
 import {computed, defineComponent, onBeforeUnmount, onMounted, reactive, toRefs} from '@vue/composition-api'
 import '@/assets/scss/pages/chatroom.scss'
 import appStore from '@/store/app'
-import {getChatRoom, getHistory, getLatestMessage, sendMessage} from "@/api/api";
+import {getChatRoom, getLatestMessage, sendMessage} from "@/api/api";
 import {ChatRoom, Message} from "@/api/types/apiTypes";
 import MsgArea from "@/components/chatroom/MsgArea.vue";
 import BottomController from "@/components/chatroom/BottomController.vue";
@@ -25,6 +25,7 @@ import AppBar from "@/components/chatroom/AppBar.vue";
 import {ioType} from "@/api/webSocketManager";
 import autoLogin from "@/api/accountManager";
 import {VApp} from 'vuetify/lib';
+import historyLoader from "@/api/historyLoader";
 
 export default defineComponent({
   name: "ChatRoom",
@@ -45,7 +46,7 @@ export default defineComponent({
         }
         return colorMode
       }),
-      currentChatRoomId: computed(() => appStore.getCurrentChatRoomId),
+      currentChatRoomId: computed(() => appStore.getCurrentChatRoomId)
     })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -53,9 +54,9 @@ export default defineComponent({
       alert(e.message)
     }
 
-    const setMsgAreaPadding = (msgArea: HTMLDivElement, bottomController: HTMLElement, appBar: HTMLDivElement): void => {
+    const setMsgAreaPadding = (msgArea: HTMLDivElement, bottomController: HTMLElement): void => {
       const attributeList = [
-        `padding-top:${appBar.clientHeight}px`,
+        // `padding-top:${appBar.clientHeight}px`,
         `padding-bottom:${bottomController.clientHeight + 10}px`
       ]
       msgArea.setAttribute(
@@ -64,8 +65,9 @@ export default defineComponent({
       );
     }
 
-    const chatroomJoined = (): void => {
-      return
+    const chatroomJoined = async (): Promise<void> => {
+      await historyLoader(20)
+      scrollMsgAreaToBottom()
     }
 
     const initializeWebSocket = async (): Promise<void> => {
@@ -90,18 +92,37 @@ export default defineComponent({
       }
     }
 
-    const loadHistoryMessages = async () => {
-      const messages = await getHistory(data.currentChatRoomId, Date.now(), 99999, appStore.getJwtKey as string) as unknown as Array<Message>
-      for (const newMsg of messages.reverse()) {
-        await appStore.createMsg({newMsg})
-        scrollMsgAreaToBottom()
-      }
-    }
+    // const loadHistoryMessages = async () => {
+    //   const messages = await getHistory(data.currentChatRoomId, data.lastQueriedMessageCreatedTime, 20, appStore.getJwtKey as string) as unknown as Array<Message>
+    //   const amountOfMessages = messages.length
+    //   if (amountOfMessages) {
+    //     data.lastQueriedMessageCreatedTime = ((messages[amountOfMessages - 1].createdAt as number) - 1)
+    //     for (const newMsg of messages.slice(amountOfMessages - 1)) {
+    //       await appStore.createMsg({newMsg, insertAtTop: true})
+    //     }
+    //     const newMsg = messages[amountOfMessages - 1]
+    //     // mark the last msg to be the observer.
+    //     newMsg.observer = true
+    //     await appStore.createMsg({newMsg, insertAtTop: true})
+    //   }
+    // }
 
     const scrollMsgAreaToBottom = (): void => {
       const msgArea = document.getElementById('msg-area') as HTMLDivElement
+      const bottomController = document.getElementById('bottom-controller') as HTMLDivElement
       msgArea.scrollIntoView(false);
+      bottomController.scrollIntoView(false);
     }
+
+    // function subscribeIsNeedNewMessages<T>(target: HTMLElement, callback: (() => T)): void {
+    //   const observerOptions = {
+    //     // root: document.getElementById('msg-area') as HTMLDivElement,
+    //     // rootMargin: '0px',
+    //     threshold: 1
+    //   }
+    //   const observer = new IntersectionObserver(callback, observerOptions);
+    //   observer.observe(target)
+    // }
 
     onMounted(async () => {
       // set the current chatroom identify
@@ -117,15 +138,14 @@ export default defineComponent({
       await appStore.SET_CHATROOM_ID(expectedChatRoomId)
       await appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
 
+      // const appBar = document.getElementById('app-bar') as HTMLDivElement
       const msgArea = document.getElementById('msg-area') as HTMLDivElement
       const bottomController = document.getElementById('bottom-controller') as HTMLElement
-      const appBar = document.getElementById('app-bar') as HTMLDivElement
       // modify the chatroom size to adapt the screen
-      setMsgAreaPadding(msgArea, bottomController, appBar)
+      setMsgAreaPadding(msgArea, bottomController)
       // load socketIO instance factory function after login
       await autoLogin()
       await initializeWebSocket()
-      await loadHistoryMessages()
     })
 
     onBeforeUnmount(() => {

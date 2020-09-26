@@ -32,6 +32,8 @@ class AppStore extends VuexModule {
   
   private sendingLogInRequest = false
   
+  private lastQueriedMessageCreatedTime = Date.now()
+  
   private static async newUser(originalData: LiffUser | Admin): Promise<LiffUser | Admin> {
     if (originalData && 'avatar' in originalData && originalData.avatar) {
       originalData.avatar = await getBase64ImgPath(originalData.avatar)
@@ -60,9 +62,9 @@ class AppStore extends VuexModule {
   }
   
   @Mutation
-  CREATE_MSG({newMsg, insertPosition}: { newMsg: Message, insertPosition: number }): void {
-    if (insertPosition) {
-      this.currentChatroomMessagesBox.splice(insertPosition, 0, newMsg)
+  CREATE_MSG({newMsg, insertAtTop}: { newMsg: Message, insertAtTop: boolean }): void {
+    if (insertAtTop) {
+      this.currentChatroomMessagesBox.unshift(newMsg)
     } else {
       this.currentChatroomMessagesBox.push(newMsg)
     }
@@ -88,10 +90,15 @@ class AppStore extends VuexModule {
     this.currentChatroomMessagesBox = []
   }
   
+  @Mutation
+  SET_LAST_QUERIED_MESSAGE_CREATED_TIME(lastQueriedMessageCreatedTime: number) {
+    this.lastQueriedMessageCreatedTime = lastQueriedMessageCreatedTime
+  }
+  
   @Action({commit: 'CREATE_MSG'})
-  async createMsg({newMsg, insertPosition}: { newMsg: Message, insertPosition?: (number | undefined) }): Promise<{ newMsg: Message, insertPosition?: (number | undefined) }> {
-    const currentUser = this.getCurrentUser
-    if (newMsg.author !== (currentUser as (Admin | LiffUser))._id) {
+  async createMsg({newMsg, insertAtTop}: { newMsg: Message, insertAtTop?: (boolean | undefined) }): Promise<{ newMsg: Message, insertAtTop?: (boolean | undefined) }> {
+    const currentUserId = (this.getCurrentUser as (Admin | LiffUser))._id
+    if (newMsg.author !== currentUserId) {
       let otherUser = this.getOtherUsers.find(user => user._id === newMsg.author)
       if (!otherUser) {
         otherUser = (await getSpecificUser(newMsg.author)) as unknown as (Admin | LiffUser)
@@ -100,7 +107,7 @@ class AppStore extends VuexModule {
         }
       }
     }
-    return {newMsg, insertPosition}
+    return {newMsg, insertAtTop}
   }
   
   @Action({commit: 'SET_CURRENT_USER'})
@@ -152,6 +159,10 @@ class AppStore extends VuexModule {
   
   get isSendingLogInRequest(): boolean {
     return this.sendingLogInRequest
+  }
+  
+  get getLastQueriedMessageCreatedTime(): number {
+    return this.lastQueriedMessageCreatedTime
   }
 }
 

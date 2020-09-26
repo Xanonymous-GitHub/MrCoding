@@ -3,26 +3,29 @@
       :class="{ 'msg-area--dark-background': isDarkMode }"
       class="msg-area"
   >
+    <UpdateDetector/>
     <Msg
+        v-for="message of messages"
+        :key="message._id"
         :is-dark-mode="isDarkMode"
-        :key="index"
         :msg-setup="{...message}"
         :owner="msgOwner(message.author)"
-        v-for="(message, index) of messages"
     />
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent, reactive, toRefs, computed} from '@vue/composition-api'
-import Msg from "@/components/chatroom/Msg.vue";
+import Msg from "@/components/chatroom/msgArea/Msg.vue";
+import UpdateDetector from '@/components/chatroom/msgArea/UpdateDetector.vue';
 import appStore from '@/store/app'
 import '@/assets/scss/components/chatroom/msg-area.scss'
 
 export default defineComponent({
   name: 'MsgArea',
   components: {
-    Msg
+    Msg,
+    UpdateDetector
   },
   props: {
     isDarkMode: {
@@ -36,15 +39,12 @@ export default defineComponent({
   },
   setup() {
     const data = reactive({
-      messages: computed(() => appStore.getMessage)
+      messages: computed(() => appStore.getMessage),
     })
 
     const msgOwner = (msgAuthor: string) => {
       const currentUser = appStore.getCurrentUser
-      if (msgAuthor === currentUser?._id) {
-        return currentUser
-      }
-      return appStore.getOtherUsers.find(user => user._id === msgAuthor)
+      return (msgAuthor === currentUser?._id) ? currentUser : appStore.getOtherUsers.find(user => user._id === msgAuthor)
     }
 
     return {

@@ -14,7 +14,6 @@ import MsgInput from "@/components/chatroom/MsgInput.vue";
 import {Message} from '@/api/types/apiTypes'
 import '@/assets/scss/components/chatroom/bottom-controller.scss'
 import {VAppBar} from 'vuetify/lib';
-import {isExternalBrowser} from "@/api/liffUserService";
 
 export default defineComponent({
   name: 'BottomController',
@@ -42,10 +41,8 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      if (!isExternalBrowser()) {
-        const appBar = document.getElementById('bottom-controller') as HTMLDivElement
-        appBar.style.setProperty('height', '70px')
-      }
+      const appBar = document.getElementById('bottom-controller') as HTMLDivElement
+      appBar.style.setProperty('height', '70px')
     })
 
     return {

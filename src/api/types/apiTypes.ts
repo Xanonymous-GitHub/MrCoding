@@ -29,6 +29,7 @@ export interface Message {
   chatroomID: string, // the chatroom's [_id](mongoose id, absolutely unique)
   updatedAt: number, // the last time of edit or create
   readonly createdAt?: number // deprecated unUseful parameter from server,
+  observer?: boolean // record that the msg is going to be the top of observer. (not from server property)
 }
 
 export interface ReadMessage {
