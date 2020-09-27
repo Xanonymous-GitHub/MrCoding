@@ -1,6 +1,8 @@
 @import "../shared/container";
+@import "../shared/mixin";
 
 @include _page('home') {
+  @include fix-100vh-in-mobile-WebKit;
   .main-field {
     height: 100%;
     width: fit-content;

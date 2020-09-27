@@ -1,15 +1,17 @@
 <template>
-  <VApp id="chatroom" :class="{ 'chat-room--dark-background': isDarkMode }"
-        class="chat-room flex-column page-container">
-    <AppBar :is-dark-mode="isDarkMode"/>
-    <MsgArea id="msg-area" :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode"/>
-    <BottomController
-        :current-chat-room-id="currentChatRoomId"
-        :is-dark-mode="isDarkMode"
-        class="chat-room--bottom"
-        @scrollMsgAreaToEnd="scrollMsgAreaToEnd"
-        @sendNewMsg="sendNewMsg"
-    />
+  <VApp id="app">
+    <main id="chatroom" :class="{ 'dark-background': isDarkMode }"
+          class="page-container flex-column">
+      <AppBar :is-dark-mode="isDarkMode"/>
+      <MsgArea id="msg-area" :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode"/>
+      <BottomController
+          :current-chat-room-id="currentChatRoomId"
+          :is-dark-mode="isDarkMode"
+          class="chat-room--bottom"
+          @scrollMsgAreaToEnd="scrollMsgAreaToEnd"
+          @sendNewMsg="sendNewMsg"
+      />
+    </main>
   </VApp>
 </template>
 

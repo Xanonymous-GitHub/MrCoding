@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'msg--sent-by-self':sendBySelf}" class="msg pr-2 mb-1">
+  <div :id="msgSetup._id" :class="{'msg--sent-by-self':sendBySelf}" class="msg pr-2 mb-1">
     <Avatar v-if="!sendBySelf" :avatar="owner.avatar" :is-dark-mode="isDarkMode"/>
     <MsgBox :context="msgSetup.context" :sent-by-self="sendBySelf"/>
     <MsgStatus :read="msgSetup.read" :sent-by-self="sendBySelf" :sent-time="msgSetup.updatedAt"/>
@@ -15,6 +15,7 @@ import appStore from '@/store/app'
 import '@/assets/scss/components/chatroom/msg.scss'
 import {Admin, LiffUser, Message} from "@/api/types/apiTypes";
 import historyLoader from "@/api/historyLoader";
+import scrollPositionMaintainer from "@/utils/scrollPositionMaintainer";
 
 export default defineComponent({
   name: 'Msg',
@@ -39,7 +40,7 @@ export default defineComponent({
       type: Boolean
     }
   },
-  setup(props, vm) {
+  setup(props) {
     const data = reactive({
       sendBySelf: false,
       getCurrentUserId: computed(() => appStore.getCurrentUser?._id)
@@ -49,7 +50,7 @@ export default defineComponent({
 
     function subscribeIsNeedNewMessages<T>(target: HTMLElement, callback: (() => T)): void {
       const observerOptions = {
-        // root: document.getElementById('msg-area') as HTMLDivElement,
+        root: document.getElementById('chatroom') as HTMLDivElement,
         // rootMargin: '0px',
         threshold: 1
       }
@@ -58,14 +59,17 @@ export default defineComponent({
     }
 
     const loadHistory = async () => {
+      const maintainer = new scrollPositionMaintainer(document.getElementById('msg-area') as HTMLDivElement)
+      maintainer.prepareFor()
       await historyLoader(20)
       await observer.disconnect()
+      maintainer.restore()
     }
 
     onMounted(() => {
       data.sendBySelf = (props.owner as (Admin | LiffUser))._id === data.getCurrentUserId
       if ((props.msgSetup as Message).observer) {
-        subscribeIsNeedNewMessages(vm.root.$el as HTMLDivElement, loadHistory)
+        subscribeIsNeedNewMessages(document.getElementById(props.msgSetup._id as string) as HTMLDivElement, loadHistory)
       }
     })
 
