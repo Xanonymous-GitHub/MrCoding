@@ -1,5 +1,5 @@
 export default class {
-  private _node!: HTMLElement
+  private readonly _node!: HTMLElement
   private _previousScrollHeightMinusTop!: number
   
   constructor(node: HTMLElement) {
@@ -7,11 +7,16 @@ export default class {
     this._previousScrollHeightMinusTop = 0;
   }
   
-  public restore = () => {
+  public restore = async () => {
     this._node.scrollTop = this._node.scrollHeight - this._previousScrollHeightMinusTop;
   }
   
-  public prepareFor = () => {
+  public prepare = () => {
     this._previousScrollHeightMinusTop = this._node.scrollHeight - this._node.scrollTop;
   }
+}
+
+export interface ScrollPositionMaintainer {
+  restore: (() => void),
+  prepare: (() => void)
 }

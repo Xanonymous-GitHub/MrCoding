@@ -13,9 +13,7 @@ import Avatar from '@/components/chatroom/msg/Avatar.vue'
 import MsgStatus from '@/components/chatroom/msg/MsgStatus.vue'
 import appStore from '@/store/app'
 import '@/assets/scss/components/chatroom/msg.scss'
-import {Admin, LiffUser, Message} from "@/api/types/apiTypes";
-import historyLoader from "@/api/historyLoader";
-import scrollPositionMaintainer from "@/utils/scrollPositionMaintainer";
+import {Admin, LiffUser} from "@/api/types/apiTypes";
 
 export default defineComponent({
   name: 'Msg',
@@ -46,31 +44,8 @@ export default defineComponent({
       getCurrentUserId: computed(() => appStore.getCurrentUser?._id)
     })
 
-    let observer: IntersectionObserver
-
-    function subscribeIsNeedNewMessages<T>(target: HTMLElement, callback: (() => T)): void {
-      const observerOptions = {
-        root: document.getElementById('chatroom') as HTMLDivElement,
-        // rootMargin: '0px',
-        threshold: 1
-      }
-      observer = new IntersectionObserver(callback, observerOptions);
-      observer.observe(target)
-    }
-
-    const loadHistory = async () => {
-      const maintainer = new scrollPositionMaintainer(document.getElementById('msg-area') as HTMLDivElement)
-      maintainer.prepareFor()
-      await historyLoader(20)
-      await observer.disconnect()
-      maintainer.restore()
-    }
-
     onMounted(() => {
       data.sendBySelf = (props.owner as (Admin | LiffUser))._id === data.getCurrentUserId
-      if ((props.msgSetup as Message).observer) {
-        subscribeIsNeedNewMessages(document.getElementById(props.msgSetup._id as string) as HTMLDivElement, loadHistory)
-      }
     })
 
     return {...toRefs(data)}

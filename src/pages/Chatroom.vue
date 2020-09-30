@@ -27,7 +27,6 @@ import AppBar from "@/components/chatroom/AppBar.vue";
 import {ioType} from "@/api/webSocketManager";
 import autoLogin from "@/api/accountManager";
 import {VApp} from 'vuetify/lib';
-import historyLoader from "@/api/historyLoader";
 
 export default defineComponent({
   name: "ChatRoom",
@@ -68,7 +67,7 @@ export default defineComponent({
     }
 
     const chatroomJoined = async (): Promise<void> => {
-      await historyLoader(20)
+      // await historyLoader(20)
       scrollMsgAreaToBottom()
     }
 
@@ -94,37 +93,12 @@ export default defineComponent({
       }
     }
 
-    // const loadHistoryMessages = async () => {
-    //   const messages = await getHistory(data.currentChatRoomId, data.lastQueriedMessageCreatedTime, 20, appStore.getJwtKey as string) as unknown as Array<Message>
-    //   const amountOfMessages = messages.length
-    //   if (amountOfMessages) {
-    //     data.lastQueriedMessageCreatedTime = ((messages[amountOfMessages - 1].createdAt as number) - 1)
-    //     for (const newMsg of messages.slice(amountOfMessages - 1)) {
-    //       await appStore.createMsg({newMsg, insertAtTop: true})
-    //     }
-    //     const newMsg = messages[amountOfMessages - 1]
-    //     // mark the last msg to be the observer.
-    //     newMsg.observer = true
-    //     await appStore.createMsg({newMsg, insertAtTop: true})
-    //   }
-    // }
-
     const scrollMsgAreaToBottom = (): void => {
       const msgArea = document.getElementById('msg-area') as HTMLDivElement
       const bottomController = document.getElementById('bottom-controller') as HTMLDivElement
       msgArea.scrollIntoView(false);
       bottomController.scrollIntoView(false);
     }
-
-    // function subscribeIsNeedNewMessages<T>(target: HTMLElement, callback: (() => T)): void {
-    //   const observerOptions = {
-    //     // root: document.getElementById('msg-area') as HTMLDivElement,
-    //     // rootMargin: '0px',
-    //     threshold: 1
-    //   }
-    //   const observer = new IntersectionObserver(callback, observerOptions);
-    //   observer.observe(target)
-    // }
 
     onMounted(async () => {
       // set the current chatroom identify

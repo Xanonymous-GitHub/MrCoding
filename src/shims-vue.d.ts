@@ -4,3 +4,4 @@ declare module '*.vue' {
 }
 
 declare module 'socket.io-client';
+declare module 'body-scroll-lock';

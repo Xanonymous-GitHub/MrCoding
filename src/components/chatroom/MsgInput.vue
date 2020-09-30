@@ -64,8 +64,20 @@ export default defineComponent({
       emit('scrollMsgAreaToEnd')
     }
 
+    // function onBottomFocused() {
+    //   const bottomController = document.querySelector('#bottom-controller') as HTMLDivElement
+    //   bottomController.style.position = 'relative'
+    // }
+    //
+    // function onBottomBlurred() {
+    //   const bottomController = document.querySelector('#bottom-controller') as HTMLDivElement
+    //   bottomController.style.position = 'fixed'
+    // }
+
     return {
       sendMessage,
+      // onBottomFocused,
+      // onBottomBlurred,
       ...toRefs(data)
     }
   }

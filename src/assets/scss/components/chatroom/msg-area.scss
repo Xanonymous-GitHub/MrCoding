@@ -1,7 +1,6 @@
 @mixin msg-area {
   .msg-area {
     padding: 0 3px;
-    overflow: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
     width: 100%;
