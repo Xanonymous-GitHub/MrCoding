@@ -8,8 +8,8 @@
           :current-chat-room-id="currentChatRoomId"
           :is-dark-mode="isDarkMode"
           class="chat-room--bottom"
-          @scrollMsgAreaToEnd="scrollMsgAreaToEnd"
-          @sendNewMsg="sendNewMsg"
+          @scroll-msg-area-to-end="scrollMsgAreaToEnd"
+          @send-new-msg="sendNewMsg"
       />
     </main>
   </VApp>

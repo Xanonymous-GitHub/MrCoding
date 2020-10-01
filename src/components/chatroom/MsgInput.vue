@@ -60,8 +60,8 @@ export default defineComponent({
       e.stopImmediatePropagation()
       const textContext = data.textContent.trim()
       data.textContent = ''
-      emit('sendNewMsg', textContext)
-      emit('scrollMsgAreaToEnd')
+      emit('send-new-msg', textContext)
+      emit('scroll-msg-area-to-end')
     }
 
     // function onBottomFocused() {

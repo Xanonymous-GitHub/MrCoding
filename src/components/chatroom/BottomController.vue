@@ -2,8 +2,8 @@
   <VAppBar id="bottom-controller" :dark="isDarkMode">
     <MsgInput
         :current-chat-room-id="currentChatRoomId"
-        @scrollMsgAreaToEnd="scrollMsgAreaToEnd"
-        @sendNewMsg="sendNewMsg"
+        @scroll-msg-area-to-End="scrollMsgAreaToEnd"
+        @send-new-msg="sendNewMsg"
     />
   </VAppBar>
 </template>
@@ -33,11 +33,11 @@ export default defineComponent({
   },
   setup(_, {emit}) {
     const scrollMsgAreaToEnd = () => {
-      emit('scrollMsgAreaToEnd')
+      emit('scroll-msg-area-to-end')
     }
 
     const sendNewMsg = (newMsg: Message) => {
-      emit('sendNewMsg', newMsg)
+      emit('send-new-msg', newMsg)
     }
 
     onMounted(() => {

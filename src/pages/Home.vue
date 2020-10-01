@@ -77,8 +77,8 @@ import {
   ComputedRef,
 } from '@vue/composition-api';
 import appStore from '@/store/app'
-import getUserDataByJwtToken from '@/utils/jwtService'
-import {setJwtToLocalStorageWithExpire} from '@/utils/jwtTokenController'
+import getUserDataByJwtToken from '@/utils/jwtSignIn'
+import {setJwtToLocalStorageWithExpire} from '@/utils/jwtToken'
 import {adminAuth} from "@/api/api"
 import '@/assets/scss/pages/home.scss'
 import {authResponse} from "@/api/types/apiTypes";

@@ -1,5 +1,5 @@
 import appStore from '@/store/app'
-import getUserDataByJwtToken from "@/utils/jwtService";
+import getUserDataByJwtToken from "@/utils/jwtSignIn";
 import {getAccessToken, getLiffProfile, initializeLiff, isExternalBrowser, liffId} from "@/api/liffUserService";
 import {bindLineUserUidToChatroom, liffAuth} from "@/api/api";
 import {authResponse, UserType} from "@/api/types/apiTypes";

@@ -1,6 +1,6 @@
 import {Action, Module, Mutation, VuexModule, getModule} from 'vuex-module-decorators'
 import {Message, ThemeModes, Admin, LiffUser, UserType} from '@/api/types/apiTypes'
-import getBase64ImgPath from '@/utils/requestAvatar'
+import getBase64ImgPath from '@/utils/avatarCompression'
 import {getSpecificUser} from '@/api/api'
 import store from '@/store/index'
 

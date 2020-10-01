@@ -1,6 +1,6 @@
 import appStore from '@/store/app'
 import {Admin, LiffUser} from '@/api/types/apiTypes'
-import {getJwtTokenFromLocalStorage} from '@/utils/jwtTokenController'
+import {getJwtTokenFromLocalStorage} from '@/utils/jwtToken'
 import {jwtSignIn} from "@/api/api";
 
 export default async function (key?: string): Promise<boolean> {
