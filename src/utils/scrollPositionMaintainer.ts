@@ -7,11 +7,11 @@ export default class {
     this._previousScrollHeightMinusTop = 0;
   }
   
-  public restore = async () => {
+  public restore = async (): Promise<void> => {
     this._node.scrollTop = this._node.scrollHeight - this._previousScrollHeightMinusTop;
   }
   
-  public prepare = () => {
+  public prepare = (): void => {
     this._previousScrollHeightMinusTop = this._node.scrollHeight - this._node.scrollTop;
   }
 }

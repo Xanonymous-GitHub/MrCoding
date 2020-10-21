@@ -32,7 +32,7 @@ export default async function autoLogin(): Promise<void> {
         await getUserDataByJwtToken(token)
         
       } catch (e) {
-        console.log(e)
+        // console.log(e)
       }
     }
   }
