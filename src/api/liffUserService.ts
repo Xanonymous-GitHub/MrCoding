@@ -1,11 +1,5 @@
 import liff from '@line/liff';
-
-export interface Profile {
-  userId: string;
-  displayName: string;
-  pictureUrl?: string;
-  statusMessage?: string;
-}
+import {Profile} from "@/api/types/apiTypes";
 
 export const initializeLiff = async (myLiffId: string, successCallback?: (() => void)): Promise<void> => {
   await liff.init({liffId: myLiffId}, successCallback)

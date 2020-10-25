@@ -44,6 +44,13 @@ export interface authResponse {
   readonly token: string
 }
 
+export interface Profile {
+  userId: string;
+  displayName: string;
+  pictureUrl?: string;
+  statusMessage?: string;
+}
+
 export enum ThemeModes {
   AUTO = 'AUTO',
   LIGHT = 'LIGHT',
