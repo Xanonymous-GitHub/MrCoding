@@ -62,14 +62,19 @@
         <div class="chatroom-list">
 
 
-          <!--          <v-card :dark="isDarkMode" class="chatroom-card"-->
+          <!--          <v-card v-for="(i, k) in [1,2, 3, 4, 5, 6]" :key="k" :dark="isDarkMode" class="chatroom-card"-->
           <!--                  elevation="2"-->
           <!--                  hover outlined rounded shaped tile>-->
-          <!--            <v-card-title>-->
+          <!--            <v-card-title class="flex-nowrap justify-space-between">-->
           <!--              Mr.Coding Chatroom-->
+          <!--              <v-avatar class="avatar">-->
+          <!--                <v-icon :dark="isDarkMode" large>-->
+          <!--                  mdi-account-circle-->
+          <!--                </v-icon>-->
+          <!--              </v-avatar>-->
           <!--            </v-card-title>-->
           <!--            <v-card-text>-->
-          <!--              123123-->
+          <!--              123123{{ i }}-->
           <!--            </v-card-text>-->
           <!--            <v-card-actions>-->
           <!--              <v-btn :href="'/chatroom/'+123123123" color="primary" depressed rel="noreferrer noopener"-->
@@ -91,8 +96,13 @@
                     elevation="2"
                     hover
                     outlined rounded shaped tile>
-              <v-card-title>
-                Mr.Coding Chatroom
+              <v-card-title class="flex-nowrap justify-space-between">
+                {{ chatroom.name }}
+                <v-avatar class="avatar">
+                  <v-icon :dark="isDarkMode" large>
+                    mdi-account-circle
+                  </v-icon>
+                </v-avatar>
               </v-card-title>
               <v-card-text>
                 {{ chatroom._id }}

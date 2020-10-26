@@ -19,6 +19,8 @@ export interface Admin extends LiffUser {
 export interface ChatRoom {
   readonly _id: string, // mongoose id, absolutely unique, is the route path at /:chatroom
   closed: boolean // show that if this room is closed or not.
+  readonly name: string // the chatroom's name provided by server.
+  readonly avatar: string // the chatroom owner's line avatar provided by server.
 }
 
 export interface Message {
