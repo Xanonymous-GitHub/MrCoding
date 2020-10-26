@@ -61,7 +61,7 @@ export default defineComponent({
     const loadHistory = async ($state: StateChanger) => {
       try {
         await new Promise(resolve => setTimeout(() => resolve(), 500))
-        if (await historyLoader(30, '#chatroom')) {
+        if (await historyLoader(30)) {
           $state.loaded();
         } else {
           $state.complete();

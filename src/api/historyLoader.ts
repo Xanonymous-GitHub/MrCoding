@@ -3,7 +3,7 @@ import appStore from "@/store/app";
 import {Message, ResponseError} from "@/api/types/apiTypes";
 // import scrollPositionMaintainer, {ScrollPositionMaintainer} from "@/utils/scrollPositionMaintainer";
 
-export default async function (queryAmount: number, scrollWrapperSelector?: string): Promise<boolean> {
+export default async function (queryAmount: number): Promise<boolean> {
   const currentChatRoomId = appStore.getCurrentChatRoomId
   const lastQueriedMessageCreatedTime = appStore.getLastQueriedMessageCreatedTime
   if (!appStore.isLoggedIn) {

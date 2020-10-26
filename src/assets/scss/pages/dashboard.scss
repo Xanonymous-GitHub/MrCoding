@@ -2,13 +2,16 @@
 
 @include _page('dashboard') {
   .dashboard-field {
-    font-size: 2em;
-    color: #0d47a1;
-
     .chatroom-list {
+      user-select: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-rows: auto;
+      gap: 1em;
+      margin: 1em;
 
-      .chatroom {
-        display: block;
+      .chatroom-card {
+
       }
     }
   }
