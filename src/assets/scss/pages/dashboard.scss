@@ -1,14 +1,53 @@
 @import "../shared/container";
+@import "../shared/mixin";
 
 @include _page('dashboard') {
+  @include fix-100vh-in-mobile-WebKit;
+
+  .dark-background {
+    background-color: #272727;
+  }
+
   .dashboard-field {
+    .bar {
+      transform: translateY(-1px);
+
+      .content {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+
+        .left {
+          flex-wrap: nowrap;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .right {
+          .avatar {
+            position: relative;
+            border: 2px solid white;
+
+            img {
+              height: 100%;
+              width: auto;
+            }
+          }
+        }
+      }
+    }
+
     .chatroom-list {
       user-select: none;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       grid-template-rows: auto;
       gap: 1em;
-      margin: 1em;
+      margin: 5em 1em 1em 1em;
 
       .chatroom-card {
 
