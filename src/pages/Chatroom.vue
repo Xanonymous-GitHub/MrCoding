@@ -119,6 +119,7 @@ export default defineComponent({
       const bottomController = document.getElementById('bottom-controller') as HTMLElement
       // modify the chatroom size to adapt the screen
       setMsgAreaPadding(msgArea, bottomController)
+
       // load socketIO instance factory function after login
       await autoLogin()
       await initializeWebSocket()

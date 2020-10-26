@@ -21,7 +21,7 @@ const renderRoutes = (() => {
 
 module.exports = {
   devServer: {
-    proxy: 'http://mrcoding.org:8787'
+    proxy: 'https://mrcoding.org'
   },
   "transpileDependencies": [
     "vuetify",

@@ -4,7 +4,11 @@
       class="msg-area"
   >
     <UpdateDetector/>
-    <InfiniteLoading direction="top" distance="200" spinner="spiral" @infinite="loadHistory"/>
+    <InfiniteLoading direction="top" distance="20" spinner="spiral" @infinite="loadHistory">
+      <template #no-more>
+        <div/>
+      </template>
+    </InfiniteLoading>
     <Msg
         v-for="message of messages"
         :key="message._id"
@@ -57,7 +61,7 @@ export default defineComponent({
     const loadHistory = async ($state: StateChanger) => {
       try {
         await new Promise(resolve => setTimeout(() => resolve(), 500))
-        if (await historyLoader(10, '.msg-area')) {
+        if (await historyLoader(30, '#chatroom')) {
           $state.loaded();
         } else {
           $state.complete();

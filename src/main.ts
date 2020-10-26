@@ -4,9 +4,20 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import VueCompositionAPI from '@vue/composition-api'
+import InfiniteLoading from 'vue-infinite-loading';
 
 Vue.config.productionTip = false
 Vue.use(VueCompositionAPI)
+Vue.use(InfiniteLoading, {
+  props: {
+    spinner: 'spiral',
+    distance: 20,
+    noMore: ''
+  },
+  system: {
+    throttleLimit: 300,
+  },
+})
 
 const app = new Vue({
   router,
