@@ -50,7 +50,12 @@
       margin: 5em 1em 1em 1em;
 
       .chatroom-card {
-
+        .avatar {
+          img {
+            width: 36px;
+            height: auto;
+          }
+        }
       }
     }
   }

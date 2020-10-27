@@ -3,7 +3,9 @@
     <main id="dashboard" :class="{ 'dark-background': isDarkMode }" class="page-container">
       <div class="dashboard-field">
 
+
         <v-app-bar
+            id="bar"
             class="bar"
             color="deep-purple"
             dark
@@ -61,7 +63,6 @@
 
         <div class="chatroom-list">
 
-
           <!--          <v-card v-for="(i, k) in [1,2, 3, 4, 5, 6]" :key="k" :dark="isDarkMode" class="chatroom-card"-->
           <!--                  elevation="2"-->
           <!--                  hover outlined rounded shaped tile>-->
@@ -91,11 +92,14 @@
               min-height="150px"
               transition="fade-transition"
           >
-            <v-card :dark="isDarkMode"
-                    class="chatroom-card"
-                    elevation="2"
-                    hover
-                    outlined rounded shaped tile>
+            <v-card
+                ref="cards"
+                :dark="isDarkMode"
+                :name="chatroom._id"
+                class="chatroom-card"
+                elevation="2"
+                hover
+                outlined rounded shaped tile>
               <v-card-title class="flex-nowrap justify-space-between">
                 {{ chatroom.name }}
                 <v-avatar class="avatar">
@@ -122,13 +126,14 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
+import {computed, defineComponent, onMounted, reactive, toRefs, ref} from "@vue/composition-api";
 import '@/assets/scss/pages/dashboard.scss';
 import {getAllChatRooms} from "@/api/api";
 import {ChatRoom} from "@/api/types/apiTypes";
 import appStore from '@/store/app'
 import autoLogin from "@/api/accountManager";
 import {VApp} from 'vuetify/lib';
+import getBase64ImgPath from '@/utils/avatarCompression'
 
 export default defineComponent({
   name: "Dashboard",
@@ -141,16 +146,19 @@ export default defineComponent({
       isDarkMode: computed(() => appStore.isDarkMode),
       drawer: false,
       isActive: [] as Array<boolean>,
+      avatars: {} as { [key: string]: string },
+      chatroomCardAvatar: {} as { [key: string]: string }
     })
+
+    const cards = ref(null)
 
     const triggerDrawer = () => {
       data.drawer = true
     }
 
-    const replaceAvatar = () => {
-      const avatar = appStore.getCurrentUser?.avatar
+    const replaceAvatar = (avatar: string | undefined, container: HTMLElement) => {
       if (avatar && avatar !== '') {
-        const avatarContainer = document.querySelector('.avatar') as HTMLDivElement
+        const avatarContainer = container.querySelector('.avatar') as HTMLDivElement
         const defaultAvatar = avatarContainer.childNodes[0] as HTMLElement
         avatarContainer.removeChild(defaultAvatar)
         const realAvatar = document.createElement("img") as HTMLImageElement
@@ -160,15 +168,36 @@ export default defineComponent({
       }
     }
 
+    const getChatroomAvatar = async () => {
+      for (const chatroom of data.chatroomBundle) {
+        if (chatroom && chatroom.avatar && chatroom.avatar.slice(0, 4) !== 'data') {
+          if (!data.avatars[chatroom.avatar]) {
+            data.avatars[chatroom.avatar] = await getBase64ImgPath(chatroom.avatar)
+          }
+          data.chatroomCardAvatar[chatroom._id] = data.avatars[chatroom.avatar]
+        }
+      }
+    }
+
+    const equipAvatars = (chatroomCards: Array<{ $el: HTMLElement }>) => {
+      for (const chatroomCard of chatroomCards) {
+        const _id = chatroomCard.$el.getAttribute('name') as string
+        replaceAvatar(data.chatroomCardAvatar[_id], chatroomCard.$el)
+      }
+    }
+
     onMounted(async () => {
       await autoLogin()
       const jwtToken = appStore.getJwtKey;
       if (jwtToken) {
         data.chatroomBundle = (await getAllChatRooms(jwtToken)) as Array<ChatRoom>
       }
-      replaceAvatar()
+      replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.bar') as HTMLElement)
+      await getChatroomAvatar()
+      equipAvatars((cards as unknown as { value: Array<{ $el: HTMLElement }> }).value)
     })
     return {
+      cards,
       triggerDrawer,
       ...toRefs(data)
     }
