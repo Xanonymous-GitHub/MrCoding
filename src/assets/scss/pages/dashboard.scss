@@ -3,12 +3,13 @@
 
 @include _page('dashboard') {
   @include fix-100vh-in-mobile-WebKit;
-
+  -webkit-overflow-scrolling: touch;
   .dark-background {
     background-color: #272727;
   }
 
   .dashboard-field {
+    -webkit-overflow-scrolling: touch;
     .bar {
       transform: translateY(-1px);
       user-select: none;
@@ -43,6 +44,7 @@
     }
 
     .chatroom-list {
+      -webkit-overflow-scrolling: touch;
       user-select: none;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -51,6 +53,7 @@
       margin: 1em;
 
       .chatroom-card {
+        -webkit-overflow-scrolling: touch;
         .avatar {
           img {
             width: 36px;

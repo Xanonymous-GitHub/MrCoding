@@ -78,18 +78,15 @@
 
             <v-lazy
                 v-for="(chatroom, key) in chatroomBundle" :key="key"
+                ref="cards"
                 v-model="isActive[key]"
+                :name="chatroom._id"
                 :options="{threshold: .5}"
                 min-height="150px"
                 transition="fade-transition"
             >
-              <v-card
-                  ref="cards"
-                  :dark="isDarkMode"
-                  :name="chatroom._id"
-                  class="chatroom-card"
-                  elevation="2"
-                  outlined rounded shaped tile>
+              <v-card :dark="isDarkMode" class="chatroom-card" elevation="2" outlined
+                      rounded shaped tile>
                 <v-card-title class="flex-nowrap justify-space-between">
                   {{ chatroom.name }}
                   <v-avatar class="avatar">
@@ -142,7 +139,23 @@ export default defineComponent({
       chatroomCardAvatar: {} as { [key: string]: string }
     })
 
+    const onCardInView = (entries: Array<IntersectionObserverEntry>) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          observer.unobserve(entry.target)
+          const _id = entry.target.getAttribute('name') as string
+          setTimeout(() => {
+            replaceAvatar(data.chatroomCardAvatar[_id], entry.target as HTMLElement)
+          }, 550)
+        }
+      })
+    }
+
     const cards = ref(null)
+    const observerOptions = {
+      threshold: 0.5
+    }
+    const observer = new IntersectionObserver(onCardInView, observerOptions);
 
     const triggerDrawer = () => {
       data.drawer = !data.drawer
@@ -171,10 +184,9 @@ export default defineComponent({
       }
     }
 
-    const equipAvatars = (chatroomCards: Array<{ $el: HTMLElement }>) => {
+    const equipObserver = (chatroomCards: Array<{ $el: HTMLElement }>) => {
       for (const chatroomCard of chatroomCards) {
-        const _id = chatroomCard.$el.getAttribute('name') as string
-        replaceAvatar(data.chatroomCardAvatar[_id], chatroomCard.$el)
+        observer.observe(chatroomCard.$el)
       }
     }
 
@@ -188,7 +200,7 @@ export default defineComponent({
       await getChatroomAvatar()
 
       if (cards.value) {
-        equipAvatars((cards as unknown as { value: Array<{ $el: HTMLElement }> }).value)
+        equipObserver((cards as unknown as { value: Array<{ $el: HTMLElement }> }).value)
       }
     })
 

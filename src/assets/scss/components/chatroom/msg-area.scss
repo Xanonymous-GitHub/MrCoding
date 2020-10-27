@@ -1,5 +1,6 @@
 @mixin msg-area {
   .msg-area {
+    -webkit-overflow-scrolling: touch;
     padding: 0 3px;
     -ms-overflow-style: none;
     scrollbar-width: none;

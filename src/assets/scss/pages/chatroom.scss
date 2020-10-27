@@ -5,6 +5,6 @@
   .dark-background {
     background-color: #272727;
   }
-
+  -webkit-overflow-scrolling: touch;
   @include fix-100vh-in-mobile-WebKit;
 }

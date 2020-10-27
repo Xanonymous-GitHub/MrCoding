@@ -9,6 +9,7 @@
   .msg {
     display: flex;
     align-items: flex-end;
+    -webkit-overflow-scrolling: touch;
 
     &--sent-by-self {
       flex-direction: row-reverse;
