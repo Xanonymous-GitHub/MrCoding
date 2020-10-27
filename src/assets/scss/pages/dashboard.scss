@@ -11,6 +11,7 @@
   .dashboard-field {
     .bar {
       transform: translateY(-1px);
+      user-select: none;
 
       .content {
         display: flex;
@@ -47,7 +48,7 @@
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       grid-template-rows: auto;
       gap: 1em;
-      margin: 5em 1em 1em 1em;
+      margin: 1em;
 
       .chatroom-card {
         .avatar {

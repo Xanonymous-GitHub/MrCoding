@@ -2,22 +2,45 @@
   <VApp>
     <main id="dashboard" :class="{ 'dark-background': isDarkMode }" class="page-container">
       <div class="dashboard-field">
-
+        <v-navigation-drawer
+            v-model="drawer"
+            :dark="isDarkMode"
+            app
+            clipped
+        >
+          <v-list>
+            <v-list-item link>
+              <v-list-item-action>
+                <v-icon>mdi-view-dashboard</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Dashboard</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item link>
+              <v-list-item-action>
+                <v-icon>mdi-cog</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Settings</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-navigation-drawer>
 
         <v-app-bar
             id="bar"
+            app
             class="bar"
-            color="deep-purple"
+            clipped-left
+            color="#2994b2"
             dark
-            fixed
         >
           <div class="content">
             <div class="left">
               <v-app-bar-nav-icon @click.prevent.stop="triggerDrawer"></v-app-bar-nav-icon>
-
               <v-toolbar-title>NPC Mr.Coding</v-toolbar-title>
             </div>
-
             <div class="right">
               <v-avatar class="avatar" right size="42px">
                 <v-icon :dark="isDarkMode" large>
@@ -26,100 +49,69 @@
               </v-avatar>
             </div>
           </div>
-
         </v-app-bar>
 
-        <v-navigation-drawer
-            v-model="drawer"
-            :dark="isDarkMode"
-            app
-            fixed
-            temporary
-        >
-          <v-list
-              dense
-              nav
-          >
-            <v-list-item-group
-                active-class="deep-purple--text text--accent-4"
+        <v-main>
+          <div class="chatroom-list">
+
+            <!--                <v-card v-for="(i, k) in [1,2, 3, 4, 5, 6]" :key="k" :dark="isDarkMode" class="chatroom-card"-->
+            <!--                        elevation="2"-->
+            <!--                        hover outlined rounded shaped tile>-->
+            <!--                  <v-card-title class="flex-nowrap justify-space-between">-->
+            <!--                    Mr.Coding Chatroom-->
+            <!--                    <v-avatar class="avatar">-->
+            <!--                      <v-icon :dark="isDarkMode" large>-->
+            <!--                        mdi-account-circle-->
+            <!--                      </v-icon>-->
+            <!--                    </v-avatar>-->
+            <!--                  </v-card-title>-->
+            <!--                  <v-card-text>-->
+            <!--                    123123{{ i }}-->
+            <!--                  </v-card-text>-->
+            <!--                  <v-card-actions>-->
+            <!--                    <v-btn :href="'/chatroom/'+123123123" color="primary" depressed rel="noreferrer noopener"-->
+            <!--                           target="_blank" text>Enter-->
+            <!--                    </v-btn>-->
+            <!--                    <v-btn color="error" depressed text>Close</v-btn>-->
+            <!--                  </v-card-actions>-->
+            <!--                </v-card>-->
+
+            <v-lazy
+                v-for="(chatroom, key) in chatroomBundle" :key="key"
+                v-model="isActive[key]"
+                :options="{threshold: .5}"
+                min-height="150px"
+                transition="fade-transition"
             >
-              <v-list-item>
-                <v-list-item-icon>
-                  <v-icon>mdi-home</v-icon>
-                </v-list-item-icon>
-                <v-list-item-title>Home</v-list-item-title>
-              </v-list-item>
-
-              <v-list-item>
-                <v-list-item-icon>
-                  <v-icon>mdi-account</v-icon>
-                </v-list-item-icon>
-                <v-list-item-title>Account</v-list-item-title>
-              </v-list-item>
-
-            </v-list-item-group>
-          </v-list>
-        </v-navigation-drawer>
-
-        <div class="chatroom-list">
-
-          <!--          <v-card v-for="(i, k) in [1,2, 3, 4, 5, 6]" :key="k" :dark="isDarkMode" class="chatroom-card"-->
-          <!--                  elevation="2"-->
-          <!--                  hover outlined rounded shaped tile>-->
-          <!--            <v-card-title class="flex-nowrap justify-space-between">-->
-          <!--              Mr.Coding Chatroom-->
-          <!--              <v-avatar class="avatar">-->
-          <!--                <v-icon :dark="isDarkMode" large>-->
-          <!--                  mdi-account-circle-->
-          <!--                </v-icon>-->
-          <!--              </v-avatar>-->
-          <!--            </v-card-title>-->
-          <!--            <v-card-text>-->
-          <!--              123123{{ i }}-->
-          <!--            </v-card-text>-->
-          <!--            <v-card-actions>-->
-          <!--              <v-btn :href="'/chatroom/'+123123123" color="primary" depressed rel="noreferrer noopener"-->
-          <!--                     target="_blank" text>Enter-->
-          <!--              </v-btn>-->
-          <!--              <v-btn color="error" depressed text>Close</v-btn>-->
-          <!--            </v-card-actions>-->
-          <!--          </v-card>-->
-
-          <v-lazy
-              v-for="(chatroom, key) in chatroomBundle" :key="key"
-              v-model="isActive[key]"
-              :options="{threshold: .5}"
-              min-height="150px"
-              transition="fade-transition"
-          >
-            <v-card
-                ref="cards"
-                :dark="isDarkMode"
-                :name="chatroom._id"
-                class="chatroom-card"
-                elevation="2"
-                hover
-                outlined rounded shaped tile>
-              <v-card-title class="flex-nowrap justify-space-between">
-                {{ chatroom.name }}
-                <v-avatar class="avatar">
-                  <v-icon :dark="isDarkMode" large>
-                    mdi-account-circle
-                  </v-icon>
-                </v-avatar>
-              </v-card-title>
-              <v-card-text>
-                {{ chatroom._id }}
-              </v-card-text>
-              <v-card-actions>
-                <v-btn :href="'/chatroom/'+chatroom._id" color="primary" depressed rel="noreferrer noopener"
-                       target="_blank" text>Enter
-                </v-btn>
-                <v-btn color="error" depressed text>Close</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-lazy>
-        </div>
+              <v-card
+                  ref="cards"
+                  :dark="isDarkMode"
+                  :name="chatroom._id"
+                  class="chatroom-card"
+                  elevation="2"
+                  outlined rounded shaped tile>
+                <v-card-title class="flex-nowrap justify-space-between">
+                  {{ chatroom.name }}
+                  <v-avatar class="avatar">
+                    <v-icon :dark="isDarkMode" large>
+                      mdi-account-circle
+                    </v-icon>
+                  </v-avatar>
+                </v-card-title>
+                <v-card-text>
+                  {{ chatroom._id }}
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn :href="'/chatroom/'+chatroom._id" color="primary" depressed
+                         rel="noreferrer noopener"
+                         target="_blank" text>Enter
+                  </v-btn>
+                  <v-btn color="error" depressed text>Close</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-lazy>
+          </div>
+        </v-main>
       </div>
     </main>
   </VApp>
@@ -144,7 +136,7 @@ export default defineComponent({
     const data = reactive({
       chatroomBundle: [] as Array<ChatRoom>,
       isDarkMode: computed(() => appStore.isDarkMode),
-      drawer: false,
+      drawer: null as unknown as boolean,
       isActive: [] as Array<boolean>,
       avatars: {} as { [key: string]: string },
       chatroomCardAvatar: {} as { [key: string]: string }
@@ -153,7 +145,7 @@ export default defineComponent({
     const cards = ref(null)
 
     const triggerDrawer = () => {
-      data.drawer = true
+      data.drawer = !data.drawer
     }
 
     const replaceAvatar = (avatar: string | undefined, container: HTMLElement) => {
@@ -194,8 +186,12 @@ export default defineComponent({
       }
       replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.bar') as HTMLElement)
       await getChatroomAvatar()
-      equipAvatars((cards as unknown as { value: Array<{ $el: HTMLElement }> }).value)
+
+      if (cards.value) {
+        equipAvatars((cards as unknown as { value: Array<{ $el: HTMLElement }> }).value)
+      }
     })
+
     return {
       cards,
       triggerDrawer,
