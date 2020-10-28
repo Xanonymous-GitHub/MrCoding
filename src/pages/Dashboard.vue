@@ -115,7 +115,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted, reactive, toRefs, ref} from "@vue/composition-api";
+import {computed, defineComponent, onMounted, reactive, toRefs, ref, nextTick} from "@vue/composition-api";
 import '@/assets/scss/pages/dashboard.scss';
 import {getAllChatRooms} from "@/api/api";
 import {ChatRoom} from "@/api/types/apiTypes";
@@ -123,6 +123,14 @@ import appStore from '@/store/app'
 import autoLogin from "@/api/accountManager";
 import {VApp} from 'vuetify/lib';
 import getBase64ImgPath from '@/utils/avatarCompression'
+
+interface ChatRoomCards {
+  $el: HTMLElement
+}
+
+interface UnrefCards {
+  value: Array<ChatRoomCards>
+}
 
 export default defineComponent({
   name: "Dashboard",
@@ -155,7 +163,7 @@ export default defineComponent({
     const observerOptions = {
       threshold: 0.5
     }
-    const observer = new IntersectionObserver(onCardInView, observerOptions);
+    const observer = new IntersectionObserver(onCardInView, observerOptions)
 
     const triggerDrawer = () => {
       data.drawer = !data.drawer
@@ -173,20 +181,30 @@ export default defineComponent({
       }
     }
 
-    const getChatroomAvatar = async () => {
+    const getChatroomAvatar = async (chatroomCards: Array<ChatRoomCards>) => {
+
+      // closure for the IntersectionObserver generator
+      const equipObserver = (): Generator<void, void, void> => {
+        return (function* () {
+          for (const chatroomCard of chatroomCards) {
+            yield observer.observe(chatroomCard.$el)
+          }
+        })()
+      }
+
+      // init a generator
+      const observerEquipHandler = equipObserver()
+
       for (const chatroom of data.chatroomBundle) {
         if (chatroom && chatroom.avatar && chatroom.avatar.slice(0, 4) !== 'data') {
           if (!data.avatars[chatroom.avatar]) {
             data.avatars[chatroom.avatar] = await getBase64ImgPath(chatroom.avatar)
           }
           data.chatroomCardAvatar[chatroom._id] = data.avatars[chatroom.avatar]
-        }
-      }
-    }
 
-    const equipObserver = (chatroomCards: Array<{ $el: HTMLElement }>) => {
-      for (const chatroomCard of chatroomCards) {
-        observer.observe(chatroomCard.$el)
+          // equip the observer to the chatroom card
+          observerEquipHandler.next()
+        }
       }
     }
 
@@ -196,12 +214,16 @@ export default defineComponent({
       if (jwtToken) {
         data.chatroomBundle = (await getAllChatRooms(jwtToken)) as Array<ChatRoom>
       }
-      replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.bar') as HTMLElement)
-      await getChatroomAvatar()
 
-      if (cards.value) {
-        equipObserver((cards as unknown as { value: Array<{ $el: HTMLElement }> }).value)
-      }
+      // replace admin avatar
+      replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.bar') as HTMLElement)
+
+      // wait for DOM loaded.
+      nextTick(async () => {
+        if (cards.value) {
+          await getChatroomAvatar((cards as unknown as UnrefCards).value)
+        }
+      })
     })
 
     return {

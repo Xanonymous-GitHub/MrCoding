@@ -18,8 +18,10 @@ body {
     overflow: auto;
     overscroll-behavior: contain;
     -ms-scroll-chaining: none;
-    //scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
     background-color: #272727;
   }
+}
+
+* {
+  -webkit-overflow-scrolling: touch;
 }
