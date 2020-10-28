@@ -182,28 +182,14 @@ export default defineComponent({
     }
 
     const getChatroomAvatar = async (chatroomCards: Array<ChatRoomCards>) => {
-
-      // closure for the IntersectionObserver generator
-      const equipObserver = (): Generator<void, void, void> => {
-        return (function* () {
-          for (const chatroomCard of chatroomCards) {
-            yield observer.observe(chatroomCard.$el)
-          }
-        })()
-      }
-
-      // init a generator
-      const observerEquipHandler = equipObserver()
-
+      let i = 0
       for (const chatroom of data.chatroomBundle) {
         if (chatroom && chatroom.avatar && chatroom.avatar.slice(0, 4) !== 'data') {
           if (!data.avatars[chatroom.avatar]) {
             data.avatars[chatroom.avatar] = await getBase64ImgPath(chatroom.avatar)
           }
           data.chatroomCardAvatar[chatroom._id] = data.avatars[chatroom.avatar]
-
-          // equip the observer to the chatroom card
-          observerEquipHandler.next()
+          observer.observe(chatroomCards[i++].$el)
         }
       }
     }
