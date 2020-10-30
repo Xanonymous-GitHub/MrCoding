@@ -1,0 +1,38 @@
+@mixin state-badge {
+  $color-pr-state-closed-bg: #d73a49;
+  $color-pr-state-open-bg: #28a745;
+
+  .state {
+    display: inline-block;
+    padding: 5px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: 2em;
+    color: white;
+    border-color: transparent;
+
+    &--green {
+      background-color: $color-pr-state-open-bg;
+    }
+
+    &--red {
+      background-color: $color-pr-state-closed-bg;
+    }
+
+    svg:not(:root) {
+      overflow: hidden;
+    }
+
+    .oct-icon {
+      display: inline-block;
+      vertical-align: text-bottom;
+      vertical-align: text-top;
+      fill: currentColor;
+    }
+  }
+}
+
+@include state-badge;

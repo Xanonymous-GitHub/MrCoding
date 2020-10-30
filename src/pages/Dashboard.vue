@@ -54,27 +54,30 @@
         <v-main>
           <div class="chatroom-list">
 
-            <!--                <v-card v-for="(i, k) in [1,2, 3, 4, 5, 6]" :key="k" :dark="isDarkMode" class="chatroom-card"-->
-            <!--                        elevation="2"-->
-            <!--                        hover outlined rounded shaped tile>-->
-            <!--                  <v-card-title class="flex-nowrap justify-space-between">-->
-            <!--                    Mr.Coding Chatroom-->
-            <!--                    <v-avatar class="avatar">-->
-            <!--                      <v-icon :dark="isDarkMode" large>-->
-            <!--                        mdi-account-circle-->
-            <!--                      </v-icon>-->
-            <!--                    </v-avatar>-->
-            <!--                  </v-card-title>-->
-            <!--                  <v-card-text>-->
-            <!--                    123123{{ i }}-->
-            <!--                  </v-card-text>-->
-            <!--                  <v-card-actions>-->
-            <!--                    <v-btn :href="'/chatroom/'+123123123" color="primary" depressed rel="noreferrer noopener"-->
-            <!--                           target="_blank" text>Enter-->
-            <!--                    </v-btn>-->
-            <!--                    <v-btn color="error" depressed text>Close</v-btn>-->
-            <!--                  </v-card-actions>-->
-            <!--                </v-card>-->
+            <!--            <v-card v-for="(i, k) in [1,2, 3, 4, 5, 6]" :key="k" :dark="isDarkMode" class="chatroom-card"-->
+            <!--                    elevation="2"-->
+            <!--                    hover outlined rounded shaped tile>-->
+            <!--              <v-card-title class="flex-nowrap justify-space-between">-->
+            <!--                Mr.Coding Chatroom-->
+            <!--                <v-avatar class="avatar">-->
+            <!--                  <v-icon :dark="isDarkMode" large>-->
+            <!--                    mdi-account-circle-->
+            <!--                  </v-icon>-->
+            <!--                </v-avatar>-->
+            <!--              </v-card-title>-->
+            <!--              <v-card-text>-->
+            <!--                123123{{ i }}-->
+            <!--              </v-card-text>-->
+            <!--              <v-card-actions class="justify-space-between">-->
+            <!--                <span>-->
+            <!--                  <v-btn :href="'/chatroom/'+123123123" color="primary" depressed rel="noreferrer noopener"-->
+            <!--                         target="_blank" text>Enter-->
+            <!--                  </v-btn>-->
+            <!--                  <v-btn color="error" depressed text>Close</v-btn>-->
+            <!--                </span>-->
+            <!--                <StateBadge state="closed"/>-->
+            <!--              </v-card-actions>-->
+            <!--            </v-card>-->
 
             <v-lazy
                 v-for="(chatroom, key) in chatroomBundle" :key="key"
@@ -98,12 +101,15 @@
                 <v-card-text>
                   {{ chatroom._id }}
                 </v-card-text>
-                <v-card-actions>
-                  <v-btn :href="'/chatroom/'+chatroom._id" color="primary" depressed
-                         rel="noreferrer noopener"
-                         target="_blank" text>Enter
-                  </v-btn>
-                  <v-btn color="error" depressed text>Close</v-btn>
+                <v-card-actions class="justify-space-between">
+                  <span>
+                    <v-btn :href="'/chatroom/'+chatroom._id" color="primary" depressed
+                           rel="noreferrer noopener"
+                           target="_blank" text>Enter
+                    </v-btn>
+                    <v-btn color="error" depressed text>Close</v-btn>
+                  </span>
+                  <StateBadge :state="chatroom.closed?'closed':'open'"/>
                 </v-card-actions>
               </v-card>
             </v-lazy>
@@ -123,6 +129,7 @@ import appStore from '@/store/app'
 import autoLogin from "@/api/accountManager";
 import {VApp} from 'vuetify/lib';
 import getBase64ImgPath from '@/utils/avatarCompression'
+import StateBadge from "@/components/App/StateBadge.vue";
 
 interface ChatRoomCards {
   $el: HTMLElement
@@ -135,7 +142,8 @@ interface UnrefCards {
 export default defineComponent({
   name: "Dashboard",
   components: {
-    VApp
+    VApp,
+    StateBadge
   },
   setup() {
     const data = reactive({
