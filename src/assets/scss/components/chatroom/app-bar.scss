@@ -1,5 +1,5 @@
 @mixin app-bar {
-  #app-bar {
+  .app-bar {
     position: fixed;
     top: -2px;
     user-select: none;
@@ -7,6 +7,29 @@
     font-weight: bolder;
     z-index: 9999999;
     height: min-content;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    &__title {
+      margin-right: 1em;
+
+      @media screen and (max-width: 450px) {
+        font-size: .8rem;
+      }
+
+      &--room-name {
+        &-dark {
+          margin-left: 1em;
+          color: yellow;
+        }
+
+        &-light {
+          margin-left: 1em;
+          color: darkgoldenrod;
+        }
+      }
+    }
   }
 }
 

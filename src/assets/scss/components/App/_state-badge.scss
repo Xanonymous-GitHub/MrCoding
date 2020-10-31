@@ -1,6 +1,7 @@
 @mixin state-badge {
   $color-pr-state-closed-bg: #d73a49;
   $color-pr-state-open-bg: #28a745;
+  $color-pr-state-unknown-bg: #8b8b8b;
 
   .state {
     display: inline-block;
@@ -20,6 +21,10 @@
 
     &--red {
       background-color: $color-pr-state-closed-bg;
+    }
+
+    &--grey {
+      background-color: $color-pr-state-unknown-bg;
     }
 
     svg:not(:root) {

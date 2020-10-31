@@ -2,7 +2,7 @@
   <VApp id="app">
     <main id="chatroom" :class="{ 'dark-background': isDarkMode }"
           class="page-container flex-column">
-      <AppBar :is-dark-mode="isDarkMode"/>
+      <AppBar :is-dark-mode="isDarkMode" :room-name="roomName" :state="state"/>
       <MsgArea id="msg-area" :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode"/>
       <BottomController
           :current-chat-room-id="currentChatRoomId"
@@ -47,7 +47,9 @@ export default defineComponent({
         }
         return colorMode
       }),
-      currentChatRoomId: computed(() => appStore.getCurrentChatRoomId)
+      currentChatRoomId: computed(() => appStore.getCurrentChatRoomId),
+      roomName: '',
+      state: ''
     })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -112,6 +114,8 @@ export default defineComponent({
         return
       }
       await appStore.SET_CHATROOM_ID(expectedChatRoomId)
+      data.roomName = chatRoom.name
+      data.state = chatRoom.closed ? 'closed' : 'open'
       await appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
 
       // const appBar = document.getElementById('app-bar') as HTMLDivElement
