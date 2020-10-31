@@ -2,6 +2,8 @@
   <VTextField
       id="msgInput"
       v-model="textContent"
+      :disabled="state!=='open'"
+      :placeholder="state==='open'?'Aa':'無法傳送訊息'"
       autofocus
       class="msg-input"
       clearable
@@ -9,20 +11,21 @@
       filled
       hide-details
       no-resize
-      placeholder="Aa"
       rounded
       @keypress.enter.exact.prevent="sendMessage"
   >
     <template #prepend-inner>
-      <VIcon>mdi-message-reply-text</VIcon>
+      <VIcon v-if="state==='open'">mdi-message-reply-text</VIcon>
+      <VIcon v-else disabled>mdi-message-bulleted-off</VIcon>
     </template>
     <template #append-outer>
-      <VBtn :disabled="!textContent" fab icon small @click.prevent="sendMessage($event)">
-        <VIcon>mdi-send</VIcon>
+      <VBtn :disabled="!textContent && state!=='open'" fab icon small @click.prevent="sendMessage($event)">
+        <VIcon v-if="state==='open'">mdi-send</VIcon>
+        <VIcon v-else disabled>mdi-send-lock</VIcon>
       </VBtn>
     </template>
     <template #prepend>
-      <VBtn fab icon small>
+      <VBtn :disabled="state!=='open'" fab icon small>
         <VIcon>mdi-plus-circle</VIcon>
       </VBtn>
     </template>
@@ -45,6 +48,10 @@ export default defineComponent({
     currentChatRoomId: {
       required: true,
       type: String
+    },
+    state: {
+      required: true,
+      type: String
     }
   },
   setup(_, {emit}) {
@@ -64,20 +71,8 @@ export default defineComponent({
       emit('scroll-msg-area-to-end')
     }
 
-    // function onBottomFocused() {
-    //   const bottomController = document.querySelector('#bottom-controller') as HTMLDivElement
-    //   bottomController.style.position = 'relative'
-    // }
-    //
-    // function onBottomBlurred() {
-    //   const bottomController = document.querySelector('#bottom-controller') as HTMLDivElement
-    //   bottomController.style.position = 'fixed'
-    // }
-
     return {
       sendMessage,
-      // onBottomFocused,
-      // onBottomBlurred,
       ...toRefs(data)
     }
   }

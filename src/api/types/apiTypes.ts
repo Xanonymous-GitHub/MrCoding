@@ -65,3 +65,11 @@ export enum UserType {
   ADMIN = 'ADMIN',
   UNKNOWN = 'UNKNOWN'
 }
+
+export interface SMap {
+  [key: string]: string
+}
+
+export interface BMap {
+  [key: string]: boolean
+}

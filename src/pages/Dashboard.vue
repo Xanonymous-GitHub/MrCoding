@@ -53,32 +53,6 @@
 
         <v-main>
           <div class="chatroom-list">
-
-            <!--            <v-card v-for="(i, k) in [1,2, 3, 4, 5, 6]" :key="k" :dark="isDarkMode" class="chatroom-card"-->
-            <!--                    elevation="2"-->
-            <!--                    hover outlined rounded shaped tile>-->
-            <!--              <v-card-title class="flex-nowrap justify-space-between">-->
-            <!--                Mr.Coding Chatroom-->
-            <!--                <v-avatar class="avatar">-->
-            <!--                  <v-icon :dark="isDarkMode" large>-->
-            <!--                    mdi-account-circle-->
-            <!--                  </v-icon>-->
-            <!--                </v-avatar>-->
-            <!--              </v-card-title>-->
-            <!--              <v-card-text>-->
-            <!--                123123{{ i }}-->
-            <!--              </v-card-text>-->
-            <!--              <v-card-actions class="justify-space-between">-->
-            <!--                <span>-->
-            <!--                  <v-btn :href="'/chatroom/'+123123123" color="primary" depressed rel="noreferrer noopener"-->
-            <!--                         target="_blank" text>Enter-->
-            <!--                  </v-btn>-->
-            <!--                  <v-btn color="error" depressed text>Close</v-btn>-->
-            <!--                </span>-->
-            <!--                <StateBadge state="closed"/>-->
-            <!--              </v-card-actions>-->
-            <!--            </v-card>-->
-
             <v-lazy
                 v-for="(chatroom, key) in chatroomBundle" :key="key"
                 ref="cards"
@@ -88,8 +62,10 @@
                 min-height="150px"
                 transition="fade-transition"
             >
-              <v-card :dark="isDarkMode" class="chatroom-card" elevation="2" outlined
-                      rounded shaped tile>
+              <v-card :dark="isDarkMode" :disabled="inProgressingChatroom[chatroom._id]"
+                      :loading="inProgressingChatroom[chatroom._id]"
+                      class="chatroom-card"
+                      elevation="2" outlined rounded shaped tile>
                 <v-card-title class="flex-nowrap justify-space-between">
                   {{ chatroom.name }}
                   <v-avatar class="avatar">
@@ -107,7 +83,10 @@
                            rel="noreferrer noopener"
                            target="_blank" text>Enter
                     </v-btn>
-                    <v-btn color="error" depressed text>Close</v-btn>
+                    <v-btn :color="chatroom.closed?'green':'error'" depressed text
+                           @click.prevent.stop="changeRoomStatus(chatroom._id)">
+                      {{ chatroom.closed ? 'open' : 'close' }}
+                    </v-btn>
                   </span>
                   <StateBadge :state="chatroom.closed?'closed':'open'"/>
                 </v-card-actions>
@@ -123,8 +102,8 @@
 <script lang="ts">
 import {computed, defineComponent, onMounted, reactive, toRefs, ref, nextTick} from "@vue/composition-api";
 import '@/assets/scss/pages/dashboard.scss';
-import {getAllChatRooms} from "@/api/api";
-import {ChatRoom} from "@/api/types/apiTypes";
+import {getAllChatRooms, setChatRoomClosingState} from "@/api/api";
+import {BMap, ChatRoom, SMap} from "@/api/types/apiTypes";
 import appStore from '@/store/app'
 import autoLogin from "@/api/accountManager";
 import {VApp} from 'vuetify/lib';
@@ -151,8 +130,9 @@ export default defineComponent({
       isDarkMode: computed(() => appStore.isDarkMode),
       drawer: null as unknown as boolean,
       isActive: [] as Array<boolean>,
-      avatars: {} as { [key: string]: string },
-      chatroomCardAvatar: {} as { [key: string]: string }
+      avatars: {} as SMap,
+      chatroomCardAvatar: {} as SMap,
+      inProgressingChatroom: {} as BMap
     })
 
     const onCardInView = (entries: Array<IntersectionObserverEntry>) => {
@@ -216,6 +196,46 @@ export default defineComponent({
       }
     }
 
+    const changeRoomStatus = async (id: string) => {
+      const chatroomBundle = data.chatroomBundle.entries()
+      let targetChatroom!: ChatRoom
+      let targetIndex!: number
+
+      //locate the chatroom in array.
+      for (const [i, chatroom] of chatroomBundle) {
+        if (chatroom._id === id) {
+          targetChatroom = chatroom
+          targetIndex = i
+          break
+        }
+      }
+
+      // disable the card
+      await new Promise(resolve => resolve(
+          (() => data.inProgressingChatroom[targetChatroom._id] = true)()
+      ))
+
+
+      // call api
+      nextTick(async () => {
+        if (targetChatroom) {
+          const currentStatus = targetChatroom.closed
+          const jwtToken = appStore.getJwtKey
+          if (jwtToken) {
+            const changedChatroom = (await setChatRoomClosingState(targetChatroom._id, !currentStatus, jwtToken)) as unknown as ChatRoom
+            if (!('message' in changedChatroom) && !('statusCode' in changedChatroom)) {
+              data.chatroomBundle[targetIndex].closed = changedChatroom.closed
+            }
+          }
+        }
+      })
+
+      // enable the card
+      await new Promise(resolve => resolve(
+          (() => data.inProgressingChatroom[targetChatroom._id] = false)()
+      ))
+    }
+
     onMounted(async () => {
       await autoLogin()
       const jwtToken = appStore.getJwtKey;
@@ -236,6 +256,7 @@ export default defineComponent({
 
     return {
       cards,
+      changeRoomStatus,
       triggerDrawer,
       ...toRefs(data)
     }

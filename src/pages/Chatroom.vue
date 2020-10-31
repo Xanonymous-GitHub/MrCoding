@@ -7,6 +7,7 @@
       <BottomController
           :current-chat-room-id="currentChatRoomId"
           :is-dark-mode="isDarkMode"
+          :state="state"
           class="chat-room--bottom"
           @scroll-msg-area-to-end="scrollMsgAreaToEnd"
           @send-new-msg="sendNewMsg"
