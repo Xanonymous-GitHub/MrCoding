@@ -1,6 +1,6 @@
 <template>
   <div :id="msgSetup._id" :class="{'msg--sent-by-self':sendBySelf}" class="msg pr-2 mb-1">
-    <Avatar v-if="!sendBySelf" :avatar="owner.avatar" :is-dark-mode="isDarkMode"/>
+    <Avatar v-if="!sendBySelf" :avatar="owner.avatar" :is-dark-mode="isDarkMode" :verified="owner.cc"/>
     <MsgBox :context="msgSetup.context" :sent-by-self="sendBySelf"/>
     <MsgStatus :read="msgSetup.read" :sent-by-self="sendBySelf" :sent-time="msgSetup.updatedAt"/>
   </div>

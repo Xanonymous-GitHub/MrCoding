@@ -4,7 +4,7 @@
       class="msg-area"
   >
     <UpdateDetector/>
-    <InfiniteLoading direction="top" distance="20" spinner="spiral" @infinite="loadHistory">
+    <InfiniteLoading direction="top" :distance="20" spinner="spiral" @infinite="loadHistory">
       <template #no-more>
         <div/>
       </template>
