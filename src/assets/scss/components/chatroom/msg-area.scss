@@ -1,12 +1,14 @@
 @mixin msg-area {
+  .wrapper {
+    overflow: scroll;
+  }
+
   .msg-area {
     -webkit-overflow-scrolling: touch;
     padding: 0 3px;
     -ms-overflow-style: none;
     scrollbar-width: none;
     width: 100%;
-    min-height: 100%;
-    overscroll-behavior: none;
 
     &--dark-background {
       background-color: #272727;

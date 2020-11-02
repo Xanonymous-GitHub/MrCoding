@@ -3,13 +3,14 @@
     <main id="chatroom" :class="{ 'dark-background': isDarkMode }"
           class="page-container flex-column">
       <AppBar :is-dark-mode="isDarkMode" :room-name="roomName" :state="state"/>
-      <MsgArea id="msg-area" :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode"/>
+      <MsgArea id="msg-area" :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode"
+               @first-load-complete="scrollMsgAreaToBottom"/>
       <BottomController
           :current-chat-room-id="currentChatRoomId"
           :is-dark-mode="isDarkMode"
           :state="state"
           class="chat-room--bottom"
-          @scroll-msg-area-to-end="scrollMsgAreaToEnd"
+          @scroll-msg-area-to-end="scrollMsgAreaToBottom"
           @send-new-msg="sendNewMsg"
       />
     </main>
@@ -17,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onBeforeUnmount, onMounted, reactive, toRefs} from '@vue/composition-api'
+import {computed, defineComponent, onBeforeUnmount, onMounted, reactive, toRefs, nextTick} from '@vue/composition-api'
 import '@/assets/scss/pages/chatroom.scss'
 import appStore from '@/store/app'
 import {getChatRoom, getLatestMessage, sendMessage} from "@/api/api";
@@ -28,6 +29,8 @@ import AppBar from "@/components/chatroom/AppBar.vue";
 import {ioType} from "@/api/webSocketManager";
 import autoLogin from "@/api/accountManager";
 import {VApp} from 'vuetify/lib';
+import {scrollToElement} from "@/utils/scrollPositionMaintainer";
+import {disableBodyScroll} from 'body-scroll-lock';
 
 export default defineComponent({
   name: "ChatRoom",
@@ -50,7 +53,7 @@ export default defineComponent({
       }),
       currentChatRoomId: computed(() => appStore.getCurrentChatRoomId),
       roomName: '',
-      state: ''
+      state: '',
     })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -58,15 +61,13 @@ export default defineComponent({
       alert(e.message)
     }
 
-    const setMsgAreaPadding = (msgArea: HTMLDivElement, bottomController: HTMLElement): void => {
-      const attributeList = [
-        // `padding-top:${appBar.clientHeight}px`,
-        `padding-bottom:${bottomController.clientHeight + 10}px`
-      ]
+    const setMsgAreaHeight = (msgArea: HTMLDivElement, bottomController: HTMLElement, appBar: HTMLElement): void => {
+      const bodyHeight = (document.querySelector('body') as HTMLBodyElement).offsetHeight
+      const result = bodyHeight - (appBar.clientHeight + bottomController.clientHeight)
       msgArea.setAttribute(
           'style',
-          attributeList.join(';').toString()
-      );
+          `min-height:${result}px;max-height:${result}px`
+      )
     }
 
     const chatroomJoined = async (): Promise<void> => {
@@ -87,7 +88,9 @@ export default defineComponent({
     const receiveNewMsg = async (): Promise<void> => {
       const newMsg = (await getLatestMessage(data.currentChatRoomId, appStore.getJwtKey as string)) as unknown as Message
       await appStore.createMsg({newMsg})
-      scrollMsgAreaToBottom()
+      if (newMsg.author === appStore.getCurrentUser?._id) {
+        scrollMsgAreaToBottom()
+      }
     }
 
     const sendNewMsg = (newMsg: string): void => {
@@ -97,13 +100,28 @@ export default defineComponent({
     }
 
     const scrollMsgAreaToBottom = (): void => {
-      const msgArea = document.getElementById('msg-area') as HTMLDivElement
-      const bottomController = document.getElementById('bottom-controller') as HTMLDivElement
-      msgArea.scrollIntoView(false);
-      bottomController.scrollIntoView(false);
+      nextTick(() => {
+        const msgArea = document.getElementById('msg-area') as HTMLDivElement
+        const lastMsg = ((msgArea.querySelector('.msg-area') as HTMLElement).lastChild) as HTMLElement
+        if (lastMsg) {
+          scrollToElement(msgArea, lastMsg, 300)
+        }
+      })
     }
 
     onMounted(async () => {
+      const msgArea = document.getElementById('msg-area') as HTMLDivElement
+      const appBar = document.getElementById('app-bar') as HTMLDivElement
+      const bottomController = document.getElementById('bottom-controller') as HTMLElement
+      // modify the chatroom size to adapt the screen
+      setMsgAreaHeight(msgArea, bottomController, appBar)
+
+      // I so scary to this code.
+      window.addEventListener('resize', () => setMsgAreaHeight(msgArea, bottomController, appBar))
+
+      // lock body scroll.
+      disableBodyScroll(msgArea)
+
       // set the current chatroom identify
       const expectedChatRoomId = (vm.root.$route.params.chatroom as string) || ''
 
@@ -119,12 +137,6 @@ export default defineComponent({
       data.state = chatRoom.closed ? 'closed' : 'open'
       await appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
 
-      // const appBar = document.getElementById('app-bar') as HTMLDivElement
-      const msgArea = document.getElementById('msg-area') as HTMLDivElement
-      const bottomController = document.getElementById('bottom-controller') as HTMLElement
-      // modify the chatroom size to adapt the screen
-      setMsgAreaPadding(msgArea, bottomController)
-
       // load socketIO instance factory function after login
       await autoLogin()
       await initializeWebSocket()
@@ -137,7 +149,7 @@ export default defineComponent({
 
     return {
       sendNewMsg,
-      scrollMsgAreaToEnd: scrollMsgAreaToBottom,
+      scrollMsgAreaToBottom,
       ...toRefs(data)
     }
   }
