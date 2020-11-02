@@ -1,6 +1,7 @@
 @mixin msg-area {
   .wrapper {
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
   }
 
   .msg-area {
