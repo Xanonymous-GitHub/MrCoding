@@ -4,9 +4,19 @@
         :class="{ 'msg-area--dark-background': isDarkMode }"
         class="msg-area"
     >
-      <InfiniteLoading :distance="20" direction="top" spinner="spiral" @infinite="loadHistory">
+      <InfiniteLoading :distance="20" direction="top" spinner="spiral" style="user-select: none"
+                       @infinite="loadHistory">
         <template #no-more>
           NPC Mr.Coding
+        </template>
+        <template #no-results>
+          <v-icon
+              :dark="isDarkMode"
+              class="no-msg-img"
+              color="grey"
+              size="200px"
+          >mdi-comment-plus-outline
+          </v-icon>
         </template>
         <template #error>
           <v-alert dense outlined type="error">
@@ -52,10 +62,11 @@ export default defineComponent({
   setup(_, {emit}) {
     const data = reactive({
       messages: computed(() => appStore.getMessage),
-      retry: 5,
+      retry: 3,
+      notLoadYet: true
     })
 
-    const retryLimit = 10
+    const retryLimit = 3
     let firstComplete = true
 
     const msgOwner = (msgAuthor: string) => {
@@ -68,8 +79,14 @@ export default defineComponent({
         await new Promise(resolve => setTimeout(() => resolve(), 500))
         if (await historyLoader(30)) {
           $state.loaded();
+          if (data.notLoadYet) {
+            data.notLoadYet = false
+          }
         } else {
           $state.complete();
+          if (data.notLoadYet) {
+            emit('found-no-msg')
+          }
         }
         data.retry = retryLimit
         if (firstComplete) {

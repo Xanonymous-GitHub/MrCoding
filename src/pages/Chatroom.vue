@@ -4,7 +4,7 @@
           class="page-container flex-column">
       <AppBar :is-dark-mode="isDarkMode" :room-name="roomName" :state="state"/>
       <MsgArea id="msg-area" :current-chat-room-id="currentChatRoomId" :is-dark-mode="isDarkMode"
-               @first-load-complete="scrollMsgAreaToBottom"/>
+               @first-load-complete="scrollMsgAreaToBottom" @found-no-msg="foundNoMsg"/>
       <BottomController
           :current-chat-room-id="currentChatRoomId"
           :is-dark-mode="isDarkMode"
@@ -18,7 +18,15 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onBeforeUnmount, onMounted, reactive, toRefs, nextTick} from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  toRefs,
+  nextTick,
+} from '@vue/composition-api'
 import '@/assets/scss/pages/chatroom.scss'
 import appStore from '@/store/app'
 import {getChatRoom, getLatestMessage, sendMessage} from "@/api/api";
@@ -55,6 +63,7 @@ export default defineComponent({
       currentChatRoomId: computed(() => appStore.getCurrentChatRoomId),
       roomName: '',
       state: '',
+      isFirstMsg: false
     })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,8 +80,11 @@ export default defineComponent({
       )
     }
 
+    const foundNoMsg = (): void => {
+      data.isFirstMsg = true
+    }
+
     const chatroomJoined = async (): Promise<void> => {
-      // await historyLoader(20)
       scrollMsgAreaToBottom()
     }
 
@@ -88,6 +100,10 @@ export default defineComponent({
 
     const receiveNewMsg = async (): Promise<void> => {
       const newMsg = (await getLatestMessage(data.currentChatRoomId, appStore.getJwtKey as string)) as unknown as Message
+      if (data.isFirstMsg) {
+        const noMsgImg = document.querySelector('.no-msg-img') as HTMLImageElement
+        (noMsgImg.parentNode as HTMLElement).removeChild(noMsgImg)
+      }
       await appStore.createMsg({newMsg})
       if (newMsg.author === appStore.getCurrentUser?._id) {
         scrollMsgAreaToBottom()
@@ -151,6 +167,7 @@ export default defineComponent({
 
     return {
       sendNewMsg,
+      foundNoMsg,
       scrollMsgAreaToBottom,
       ...toRefs(data)
     }

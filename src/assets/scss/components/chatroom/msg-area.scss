@@ -18,6 +18,16 @@
     &::-webkit-scrollbar {
       display: none;
     }
+
+    .no-msg-img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      user-select: none;
+      pointer-events: none;
+      opacity: .2;
+    }
   }
 }
 
