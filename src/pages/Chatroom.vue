@@ -31,6 +31,7 @@ import autoLogin from "@/api/accountManager";
 import {VApp} from 'vuetify/lib';
 import {scrollToElement} from "@/utils/scrollPositionMaintainer";
 import {disableBodyScroll} from 'body-scroll-lock';
+import replaceAvatar from "@/utils/replaceAvatar";
 
 export default defineComponent({
   name: "ChatRoom",
@@ -139,6 +140,7 @@ export default defineComponent({
 
       // load socketIO instance factory function after login
       await autoLogin()
+      replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.app-bar__avatar') as HTMLElement)
       await initializeWebSocket()
     })
 

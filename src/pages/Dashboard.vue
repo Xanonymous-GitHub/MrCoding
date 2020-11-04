@@ -109,6 +109,7 @@ import autoLogin from "@/api/accountManager";
 import {VApp} from 'vuetify/lib';
 import getBase64ImgPath from '@/utils/avatarCompression'
 import StateBadge from "@/components/App/StateBadge.vue";
+import replaceAvatar from "@/utils/replaceAvatar";
 
 interface ChatRoomCards {
   $el: HTMLElement
@@ -155,18 +156,6 @@ export default defineComponent({
 
     const triggerDrawer = () => {
       data.drawer = !data.drawer
-    }
-
-    const replaceAvatar = (avatar: string | undefined, container: HTMLElement) => {
-      if (avatar && avatar !== '') {
-        const avatarContainer = container.querySelector('.avatar') as HTMLDivElement
-        const defaultAvatar = avatarContainer.childNodes[0] as HTMLElement
-        avatarContainer.removeChild(defaultAvatar)
-        const realAvatar = document.createElement("img") as HTMLImageElement
-        realAvatar.setAttribute("src", avatar)
-        realAvatar.setAttribute("alt", "")
-        avatarContainer.appendChild(realAvatar)
-      }
     }
 
     const getChatroomAvatar = async (chatroomCards: Array<ChatRoomCards>) => {

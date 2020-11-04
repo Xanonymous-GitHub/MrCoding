@@ -5,6 +5,13 @@
     <span v-if="roomName"
           :class="{'app-bar__title--room-name-dark':isDarkMode,'app-bar__title--room-name-light':!isDarkMode}"
           class="app-bar__title">{{ roomName }}</span>
+    <span :class="{ 'app-bar__avatar--dark-background': isDarkMode }" class="app-bar__avatar">
+      <v-avatar class="avatar" right size="40px">
+        <v-icon :dark="isDarkMode" large>
+          mdi-account-circle
+        </v-icon>
+      </v-avatar>
+    </span>
   </VAppBar>
 </template>
 

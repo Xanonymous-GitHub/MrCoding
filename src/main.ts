@@ -12,7 +12,8 @@ Vue.use(InfiniteLoading, {
   props: {
     spinner: 'spiral',
     distance: 20,
-    noMore: ''
+    noMore: 'NPC Mr.Coding',
+    noResults: ''
   },
   system: {
     throttleLimit: 300,

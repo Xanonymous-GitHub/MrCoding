@@ -6,7 +6,12 @@
     >
       <InfiniteLoading :distance="20" direction="top" spinner="spiral" @infinite="loadHistory">
         <template #no-more>
-          <div/>
+          NPC Mr.Coding
+        </template>
+        <template #error>
+          <v-alert dense outlined type="error">
+            無法連接至聊天室
+          </v-alert>
         </template>
       </InfiniteLoading>
       <Msg
@@ -47,7 +52,7 @@ export default defineComponent({
   setup(_, {emit}) {
     const data = reactive({
       messages: computed(() => appStore.getMessage),
-      retry: 10,
+      retry: 5,
     })
 
     const retryLimit = 10
