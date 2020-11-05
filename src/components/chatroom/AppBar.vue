@@ -6,20 +6,30 @@
           :class="{'app-bar__title--room-name-dark':isDarkMode,'app-bar__title--room-name-light':!isDarkMode}"
           class="app-bar__title">{{ roomName }}</span>
     <span :class="{ 'app-bar__avatar--dark-background': isDarkMode }" class="app-bar__avatar">
-      <v-avatar class="avatar" right size="40px">
-        <v-icon :dark="isDarkMode" large>
-          mdi-account-circle
-        </v-icon>
-      </v-avatar>
+      <v-badge
+          :color="isOnLine?'green':'orange'"
+          bordered
+          bottom
+          dot
+          offset-x="10"
+          offset-y="10"
+      >
+        <v-avatar class="avatar" right size="40px">
+          <v-icon :dark="isDarkMode" x-large>
+            mdi-account-circle
+          </v-icon>
+        </v-avatar>
+      </v-badge>
     </span>
   </VAppBar>
 </template>
 
 <script lang="ts">
-import {defineComponent} from '@vue/composition-api'
+import {computed, defineComponent} from '@vue/composition-api'
 import {VAppBar} from "vuetify/lib";
 import '@/assets/scss/components/chatroom/app-bar.scss'
 import StateBadge from "@/components/App/StateBadge.vue";
+import appStore from '@/store/app'
 
 export default defineComponent({
   name: "AppBar",
@@ -42,7 +52,8 @@ export default defineComponent({
     }
   },
   setup() {
-    return
+    const isOnLine = computed(() => appStore.getIsOnline)
+    return {isOnLine}
   }
 })
 </script>

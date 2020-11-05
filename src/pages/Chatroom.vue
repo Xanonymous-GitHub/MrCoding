@@ -25,7 +25,7 @@ import {
   onMounted,
   reactive,
   toRefs,
-  nextTick,
+  nextTick, Ref, ref,
 } from '@vue/composition-api'
 import '@/assets/scss/pages/chatroom.scss'
 import appStore from '@/store/app'
@@ -66,6 +66,9 @@ export default defineComponent({
       isFirstMsg: false
     })
 
+    // eslint-disable-next-line no-undef
+    let socket!: Ref<SocketIOClient.Socket>
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const webSocketException = (e: any): void => {
       alert(e.message)
@@ -86,16 +89,22 @@ export default defineComponent({
 
     const chatroomJoined = async (): Promise<void> => {
       scrollMsgAreaToBottom()
+      checkIsSocketOnline()
+    }
+
+    const webSocketDisconnect = (): void => {
+      checkIsSocketOnline()
     }
 
     const initializeWebSocket = async (): Promise<void> => {
       const socketSeed = await (async () => await (await import('@/api/webSocketManager')).default)() as unknown as (() => ioType);
-      const socket = socketSeed()
-      socket.on('successfullyJoinedChatRoomOfMrCodingPlatformInNationalTaipeiUniversityOfTechnologyProgrammingClub', chatroomJoined)
-      socket.on('message', receiveNewMsg)
-      socket.on('exception', webSocketException)
-      await socket.open()
-      socket.emit('join', data.currentChatRoomId)
+      socket = ref(socketSeed())
+      socket.value.on('successfullyJoinedChatRoomOfMrCodingPlatformInNationalTaipeiUniversityOfTechnologyProgrammingClub', chatroomJoined)
+      socket.value.on('message', receiveNewMsg)
+      socket.value.on('exception', webSocketException)
+      socket.value.on('disconnect', webSocketDisconnect)
+      await socket.value.open()
+      socket.value.emit('join', data.currentChatRoomId)
     }
 
     const receiveNewMsg = async (): Promise<void> => {
@@ -110,9 +119,14 @@ export default defineComponent({
       }
     }
 
-    const sendNewMsg = (newMsg: string): void => {
+    const sendNewMsg = async (newMsg: string): Promise<void> => {
+      const isOnline = checkIsSocketOnline()
       if (newMsg) {
-        sendMessage(data.currentChatRoomId, newMsg, appStore.getJwtKey as string)
+        if (!isOnline) {
+          await initializeWebSocket()
+          checkIsSocketOnline()
+        }
+        await sendMessage(data.currentChatRoomId, newMsg, appStore.getJwtKey as string)
       }
     }
 
@@ -124,6 +138,21 @@ export default defineComponent({
           scrollToElement(msgArea, lastMsg, 300)
         }
       })
+    }
+
+    const checkIsSocketOnline = (): boolean => {
+      socket.value.connected ? appStore.SET_ONLINE() : appStore.SET_OFFLINE()
+      return socket.value.connected
+    }
+
+    const handleVisibilityChange = async (): Promise<void> => {
+      const isOnline = checkIsSocketOnline()
+      if (document.visibilityState === 'visible') {
+        if (!isOnline) {
+          await initializeWebSocket()
+          checkIsSocketOnline()
+        }
+      }
     }
 
     onMounted(async () => {
@@ -158,6 +187,7 @@ export default defineComponent({
       await autoLogin()
       replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.app-bar__avatar') as HTMLElement)
       await initializeWebSocket()
+      document.addEventListener('visibilitychange', handleVisibilityChange)
     })
 
     onBeforeUnmount(() => {

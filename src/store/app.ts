@@ -34,6 +34,8 @@ class AppStore extends VuexModule {
   
   private lastQueriedMessageCreatedTime = Date.now()
   
+  private isOnLine = false
+  
   private static async newUser(originalData: LiffUser | Admin): Promise<LiffUser | Admin> {
     if (originalData && 'avatar' in originalData && originalData.avatar) {
       originalData.avatar = await getBase64ImgPath(originalData.avatar)
@@ -93,6 +95,16 @@ class AppStore extends VuexModule {
   @Mutation
   SET_LAST_QUERIED_MESSAGE_CREATED_TIME(lastQueriedMessageCreatedTime: number) {
     this.lastQueriedMessageCreatedTime = lastQueriedMessageCreatedTime
+  }
+  
+  @Mutation
+  SET_OFFLINE() {
+    this.isOnLine = false
+  }
+  
+  @Mutation
+  SET_ONLINE() {
+    this.isOnLine = true
   }
   
   @Action({commit: 'CREATE_MSG'})
@@ -163,6 +175,10 @@ class AppStore extends VuexModule {
   
   get getLastQueriedMessageCreatedTime(): number {
     return this.lastQueriedMessageCreatedTime
+  }
+  
+  get getIsOnline(): boolean {
+    return this.isOnLine
   }
 }
 
