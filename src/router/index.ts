@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter, {RouteConfig} from 'vue-router'
 import appStore from '@/store/app'
+import autoLogin from "@/api/accountManager";
 
 Vue.use(VueRouter)
 
@@ -26,8 +27,9 @@ const routes: Array<RouteConfig> = [
   {
     path: '/chatroom/:chatroom',
     name: 'Chatroom',
-    beforeEnter(to, from, next) {
+    async beforeEnter(to, from, next) {
       appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
+      await autoLogin()
       next()
     },
     component: () => import(
@@ -39,10 +41,43 @@ const routes: Array<RouteConfig> = [
   {
     path: '/dashboard',
     name: 'Dashboard',
+    async beforeEnter(to, from, next) {
+      await autoLogin()
+      next()
+    },
+    redirect: 'room-list',
     component: () => import(
       /* webpackChunkName: "Dashboard" */
       /* webpackPrefetch: true */
       '@/pages/Dashboard.vue'
+      ),
+    children: [
+      {
+        name: 'room-list',
+        path: '',
+        component: () => import(
+          /* webpackChunkName: "RoomList" */
+          /* webpackPrefetch: true */
+          '@/components/dashboard/RoomList.vue'
+          ),
+      },
+      {
+        path: '/settings',
+        component: () => import(
+          /* webpackChunkName: "Settings" */
+          /* webpackPrefetch: true */
+          '@/components/dashboard/Settings.vue'
+          ),
+      }
+    ]
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import(
+      /* webpackChunkName: "Login" */
+      /* webpackPrefetch: true */
+      '@/pages/Login.vue'
       )
   },
 ]

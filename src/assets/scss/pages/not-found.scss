@@ -1,0 +1,112 @@
+@import "../shared";
+
+@include _page("not-found") {
+  background-color: black;
+  background-image: linear-gradient(90deg, rgba(255, 255, 255, .07) 50%, transparent 50%),
+  linear-gradient(90deg, rgba(255, 255, 255, .13) 50%, transparent 50%),
+  linear-gradient(90deg, transparent 50%, rgba(255, 255, 255, .17) 50%),
+  linear-gradient(90deg, transparent 50%, rgba(255, 255, 255, .19) 50%);
+  background-size: 13px, 29px, 37px, 53px;
+  background-repeat: repeat;
+  height: 100vh;
+  user-select: none;
+
+  ._404 {
+    cursor: default;
+    position: relative;
+    top: 20vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .logo {
+      height: calc((1vw + 5vh) / 2);
+      width: auto;
+      transition: .3s;
+      justify-content: center;
+      fill: white;
+    }
+
+    &svg {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      align-content: center;
+
+      svg {
+        position: relative;
+        top: 0;
+        font-size: 200px;
+        width: calc((100vw + 100vh) / 2);
+        height: auto;
+      }
+    }
+  }
+
+  .content {
+    text-align: center;
+  }
+
+  h1 {
+    text-align: center;
+    font: 2em 'Roboto', sans-serif;
+    font-weight: bold;
+    color: #2f8f7f;
+    opacity: .6;
+  }
+
+  a {
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 1em;
+    font-weight: 300;
+    border: 1px solid greenyellow;
+    border-radius: 4px;
+    color: greenyellow;
+    margin: 20px 0;
+    padding: 8px 14px;
+    text-decoration: none;
+    opacity: .6;
+  }
+
+  .text {
+    fill: none;
+    stroke: white;
+    stroke-dasharray: 8% 27%;
+    stroke-width: 5px;
+    stroke-dashoffset: 1%;
+    animation: stroke-offset 6s infinite linear;
+  }
+
+  .text:nth-child(1) {
+    stroke: #ffc93c;
+    animation-delay: -1;
+  }
+
+  .text:nth-child(2) {
+    stroke: #07689f;
+    animation-delay: -2s;
+  }
+
+  .text:nth-child(3) {
+    stroke: springgreen;
+    animation-delay: -3s;
+  }
+
+  .text:nth-child(4) {
+    stroke: greenyellow;
+    animation-delay: -4s;
+  }
+
+  .text:nth-child(5) {
+    stroke: #da2717;
+    animation-delay: -5s;
+  }
+
+  @keyframes stroke-offset {
+    100% {
+      stroke-dashoffset: -35%;
+    }
+  }
+}

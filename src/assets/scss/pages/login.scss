@@ -1,7 +1,7 @@
 @import "../shared/container";
 @import "../shared/mixin";
 
-@include _page('home') {
+@include _page('login') {
   @include fix-100vh-in-mobile-WebKit;
   .main-field {
     height: 100%;
@@ -30,7 +30,7 @@
     }
   }
 
-  .home-page {
+  .login-page {
     background-color: rgba(47, 73, 94, var(--bg-opacity));
   }
 }

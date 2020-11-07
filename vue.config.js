@@ -12,7 +12,10 @@ const resolve = dir => path.join(__dirname, dir);
 const renderRoutes = (() => {
   const routes = [
     '/',
-    '/dashboard'
+    '/login',
+    '/dashboard',
+    '/settings',
+    '/chatroom',
   ].map((route) => route.replace(/\/$/, ''))
   routes.push(...routes.map((route) => `${route}/`))
   return routes
@@ -66,7 +69,7 @@ module.exports = {
       .rule("svg-sprite-loader")
       .test(/\.svg$/)
       .include
-      .add(resolve("src/assets/img"))
+      .add(resolve("src/assets/images"))
       .end()
       .use("svg-sprite-loader")
       .loader("svg-sprite-loader")
