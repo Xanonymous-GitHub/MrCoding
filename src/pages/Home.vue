@@ -1,11 +1,25 @@
 <template>
-  <div>home</div>
+  <VApp/>
 </template>
 
 <script lang="ts">
-import {defineComponent} from "@vue/composition-api";
+import {
+  defineComponent,
+  onMounted,
+} from '@vue/composition-api';
 
+import {VApp} from 'vuetify/lib';
 export default defineComponent({
-  name: 'Home'
-})
+  name: "Home",
+  props: {},
+  components: {
+    VApp,
+  },
+  setup() {
+    onMounted(async () => {
+      document.dispatchEvent(new Event('app-rendered'));
+    })
+    return {};
+  }
+});
 </script>
