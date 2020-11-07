@@ -7,6 +7,7 @@
             :dark="isDarkMode"
             app
             clipped
+            disabled
         >
           <v-list>
             <v-list-item link to="/dashboard">

@@ -35,7 +35,6 @@ import MsgArea from "@/components/chatroom/MsgArea.vue";
 import BottomController from "@/components/chatroom/BottomController.vue";
 import AppBar from "@/components/chatroom/AppBar.vue";
 import {ioType} from "@/api/webSocketManager";
-import autoLogin from "@/api/accountManager";
 import {VApp} from 'vuetify/lib';
 import {scrollToElement} from "@/utils/scrollPositionMaintainer";
 import {disableBodyScroll} from 'body-scroll-lock';
@@ -184,7 +183,6 @@ export default defineComponent({
       await appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
 
       // load socketIO instance factory function after login
-      await autoLogin()
       replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.app-bar__avatar') as HTMLElement)
       await initializeWebSocket()
       document.addEventListener('visibilitychange', handleVisibilityChange)

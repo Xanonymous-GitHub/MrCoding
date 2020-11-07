@@ -16,9 +16,9 @@
 
     .bar {
       transform: translateY(-1px);
-      user-select: none;
 
       .content {
+        user-select: none;
         display: flex;
         justify-content: space-between;
         flex-wrap: nowrap;
@@ -67,6 +67,29 @@
           }
         }
       }
+    }
+
+    .badge {
+      position: relative;
+      display: flex;
+      width: 24px;
+      height: 24px;
+      margin-left: .5em;
+
+      .verified-badge {
+        position: absolute;
+        color: rgb(56, 151, 240);
+
+        &__layer {
+          transform: scale(.7, .7);
+          color: white;
+        }
+      }
+    }
+
+    .profile {
+      margin: 1em;
+      user-select: none;
     }
   }
 }
