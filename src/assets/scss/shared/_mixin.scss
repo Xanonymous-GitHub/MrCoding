@@ -3,3 +3,9 @@
   min-height: -webkit-fill-available;
   height: 100%
 }
+
+@mixin drawer-overlay-layer {
+  nav ~ .v-overlay {
+    z-index: 999999 !important;
+  }
+}

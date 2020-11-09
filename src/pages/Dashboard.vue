@@ -3,11 +3,13 @@
     <main id="dashboard" :class="{ 'dark-background': isDarkMode }" class="page-container">
       <div class="dashboard-field">
         <v-navigation-drawer
+            id="nav"
             v-model="drawer"
             :dark="isDarkMode"
+            :style="{zIndex:drawer?1000000:undefined}"
             app
+            class="drawer"
             clipped
-            disabled
         >
           <v-list>
             <v-list-item link to="/dashboard">
@@ -60,11 +62,12 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
+import {computed, defineComponent, onMounted, reactive, toRefs, nextTick, watchEffect} from "@vue/composition-api";
 import '@/assets/scss/pages/dashboard.scss';
 import appStore from '@/store/app'
 import {VApp} from 'vuetify/lib';
 import replaceAvatar from "@/utils/replaceAvatar";
+import {disableBodyScroll, clearAllBodyScrollLocks} from 'body-scroll-lock';
 
 export default defineComponent({
   name: "Dashboard",
@@ -75,6 +78,23 @@ export default defineComponent({
     const data = reactive({
       isDarkMode: computed(() => appStore.isDarkMode),
       drawer: null as unknown as boolean,
+    })
+
+    watchEffect(() => {
+      const nav = document.querySelector('#nav') as HTMLElement
+
+      if (data.drawer) {
+        disableBodyScroll(nav)
+        nextTick(() => {
+          setTimeout(() => {
+            const overlay = document.querySelector('.v-overlay') as HTMLElement
+            (overlay.parentNode as HTMLElement).removeChild(overlay);
+            (nav.parentNode as HTMLElement).insertBefore(overlay, nav.nextSibling);
+          })
+        })
+      } else {
+        clearAllBodyScrollLocks()
+      }
     })
 
     const triggerDrawer = () => {
