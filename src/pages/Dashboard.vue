@@ -6,7 +6,7 @@
             id="nav"
             v-model="drawer"
             :dark="isDarkMode"
-            :style="{zIndex:drawer?1000000:undefined}"
+            :style="{zIndex:(isMobile && drawer) ? 1000000 : undefined}"
             app
             class="drawer"
             clipped
@@ -78,22 +78,27 @@ export default defineComponent({
     const data = reactive({
       isDarkMode: computed(() => appStore.isDarkMode),
       drawer: null as unknown as boolean,
+      isMobile: true
     })
 
     watchEffect(() => {
-      const nav = document.querySelector('#nav') as HTMLElement
-
-      if (data.drawer) {
-        disableBodyScroll(nav)
-        nextTick(() => {
-          setTimeout(() => {
+      const nav = document.querySelector('#nav.v-navigation-drawer--is-mobile') as HTMLElement
+      if (nav) {
+        data.isMobile = true
+        if (data.drawer) {
+          disableBodyScroll(nav)
+          nextTick(() => {
             const overlay = document.querySelector('.v-overlay') as HTMLElement
-            (overlay.parentNode as HTMLElement).removeChild(overlay);
-            (nav.parentNode as HTMLElement).insertBefore(overlay, nav.nextSibling);
+            if (overlay) {
+              (overlay.parentNode as HTMLElement).removeChild(overlay);
+              (nav.parentNode as HTMLElement).insertBefore(overlay, nav.nextSibling);
+            }
           })
-        })
+        } else {
+          clearAllBodyScrollLocks()
+        }
       } else {
-        clearAllBodyScrollLocks()
+        data.isMobile = false
       }
     })
 
