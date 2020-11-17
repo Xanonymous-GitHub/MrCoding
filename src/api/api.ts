@@ -1,5 +1,14 @@
 import axios from 'axios';
-import {Response, ChatRoom, ResponseError, Message, ReadMessage, authResponse, Admin, LiffUser} from "@/api/types/apiTypes";
+import {
+  Response,
+  ChatRoom,
+  ResponseError,
+  Message,
+  ReadMessage,
+  authResponse,
+  Admin,
+  LiffUser, NewAdmin
+} from "@/api/types/apiTypes";
 
 axios.defaults.baseURL = 'https://mrcoding.org/api'
 axios.defaults.headers.common['Content-Type'] = 'application/json;charset=utf-8'
@@ -159,7 +168,7 @@ export const getAllUsers = async (jwtToken: string): Response<Array<Admin | Liff
   }
 }
 
-export const createAdmin = async (adminUserData: Admin, jwtToken: string): Response<Admin> => {
+export const createAdmin = async (adminUserData: NewAdmin, jwtToken: string): Response<Admin> => {
   try {
     const {data} = await axios.post('/users/admin', {...adminUserData}, {
       headers: {

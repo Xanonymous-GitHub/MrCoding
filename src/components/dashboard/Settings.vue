@@ -1,8 +1,8 @@
 <template>
   <v-main>
     <SelfCard :current-user="currentUser" :is-dark-mode="isDarkMode"/>
-    <NewTeacherDialog :is-dark-mode="isDarkMode"/>
-    <TeacherCard :is-dark-mode="isDarkMode"/>
+    <NewTeacherDialog :is-dark-mode="isDarkMode" @creation-done="refreshTeacherCardKey"/>
+    <UserCard :key="teacherCardKey" :is-dark-mode="isDarkMode"/>
   </v-main>
 </template>
 
@@ -12,26 +12,32 @@ import appStore from "@/store/app";
 import replaceAvatar from "@/utils/replaceAvatar";
 import SelfCard from "@/components/dashboard/settingComponents/SelfCard.vue";
 import NewTeacherDialog from "@/components/dashboard/settingComponents/NewTeacherDialog.vue";
-import TeacherCard from "@/components/dashboard/settingComponents/TeacherCard.vue";
+import UserCard from "@/components/dashboard/settingComponents/UserCard.vue";
 
 export default defineComponent({
   name: "Settings",
   components: {
     SelfCard,
     NewTeacherDialog,
-    TeacherCard
+    UserCard
   },
   setup() {
     const data = reactive({
       isDarkMode: computed(() => appStore.isDarkMode),
       currentUser: computed(() => appStore.getCurrentUser),
+      teacherCardKey: 0
     })
+
+    const refreshTeacherCardKey = () => {
+      data.teacherCardKey++
+    }
 
     onMounted(() => {
       replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.profile') as HTMLElement)
     })
 
     return {
+      refreshTeacherCardKey,
       ...toRefs(data)
     }
   }

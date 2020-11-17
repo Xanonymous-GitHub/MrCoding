@@ -16,6 +16,15 @@ export interface Admin extends LiffUser {
   readonly cc: boolean // show that if the user is verified by us(dev team)
 }
 
+export interface NewAdmin {
+  username: string,
+  password: string,
+  avatar: string,
+  info: string,
+  cc: boolean,
+  admin: boolean
+}
+
 export interface ChatRoom {
   readonly _id: string, // mongoose id, absolutely unique, is the route path at /:chatroom
   closed: boolean // show that if this room is closed or not.

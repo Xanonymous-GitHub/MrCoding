@@ -6,6 +6,41 @@
       max-width="600px"
       persistent
   >
+
+    <v-dialog
+        :key="confirmDialogKey"
+        v-model="confirmDialog"
+        :dark="isDarkMode"
+        max-width="500px"
+        persistent
+    >
+      <v-card>
+        <v-card-title class="d-flex flex-nowrap align-baseline text-break">
+          <v-icon :dark="isDarkMode" class="mr-2">
+            mdi-alert-circle-outline
+          </v-icon>
+          {{ confirmMsg }}
+        </v-card-title>
+        <v-card-actions>
+          <v-btn
+              v-if="confirmAndCancel"
+              color="error"
+              text
+              @click="closeConfirm"
+          >
+            No
+          </v-btn>
+          <v-btn
+              color="primary"
+              text
+              @click="handleConfirmClicked"
+          >
+            {{ confirmAndCancel ? 'Yes' : 'OK' }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <template v-slot:activator="{ on, attrs }">
       <div class="new d-flex justify-center my-12">
         <v-btn v-bind="attrs" v-on="on" class="mx-auto" color="success">
@@ -13,7 +48,7 @@
         </v-btn>
       </div>
     </template>
-    <v-card>
+    <v-card :disabled="inProgress" :loading="inProgress">
       <v-card-title>
         <span class="headline">New Teacher's Profile</span>
       </v-card-title>
@@ -57,6 +92,7 @@
                     solo-inverted
                     type="password"
                     @change="validateForm"
+
                 >
                   <template v-slot:prepend>
                     <v-tooltip
@@ -116,6 +152,7 @@
                     </v-btn>
                   </div>
                   <v-textarea
+                      v-model="newInfo"
                       auto-grow
                       class="my-2"
                       clear-icon="mdi-close-circle"
@@ -140,12 +177,11 @@
           cancel
         </v-btn>
         <v-btn
-            :disabled="(!!!valid) || !newUsername || !newPassword || !newPasswordCheck"
-            color="blue darken-1"
-            text
-            @click="validateForm"
+            :disabled="((!!!valid) || !newUsername || !newPassword || !newPasswordCheck) && !inProgress"
+            color="primary darken-1"
+            @click="openConfirm('Are you sure you want to create this admin?', createTeacher, true)"
         >
-          Save
+          Create
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -154,6 +190,9 @@
 
 <script lang="ts">
 import {defineComponent, reactive, ref, toRefs} from "@vue/composition-api";
+import {createAdmin} from "@/api/api";
+import {Admin, NewAdmin} from "@/api/types/apiTypes";
+import appStore from "@/store/app";
 
 export default defineComponent({
   name: "NewTeacherDialog",
@@ -163,16 +202,24 @@ export default defineComponent({
       type: Boolean
     },
   },
-  setup() {
+  setup(_, {emit}) {
     const data = reactive({
       dialog: false,
+      confirmDialog: false,
+      confirmMsg: '',
+      confirmAndCancel: false,
+      confirmAction: Function(),
       newUsername: '',
       newPassword: '',
       newPasswordCheck: '',
+      newAvatar: '',
+      newInfo: '',
       passwordMatchStatusIcon: 'mdi-checkbox-blank-circle-outline',
       passwordMatchStatusIconColor: '',
       dialogKey: 0,
-      valid: true
+      confirmDialogKey: 0,
+      valid: true,
+      inProgress: false
     })
 
     const form = ref(undefined)
@@ -206,10 +253,73 @@ export default defineComponent({
       }, 300)
     }
 
+    const closeConfirm = () => {
+      data.confirmDialog = false
+      setTimeout(() => {
+        data.confirmDialogKey++
+        data.confirmMsg = ''
+        data.confirmAndCancel = false
+      }, 300)
+    }
+
+    const openConfirm = (msg: string, action: (() => unknown), needCancel?: boolean) => {
+      data.confirmMsg = msg
+      data.confirmAction = action
+      data.confirmAndCancel = Boolean(needCancel)
+      data.confirmDialog = true
+    }
+
     const validateForm = () => {
       if (form.value) {
         return (form.value as unknown as HTMLFormElement).validate()
       }
+    }
+
+    const handleConfirmClicked = () => {
+      data.confirmAction()
+      closeConfirm()
+    }
+
+    const createTeacher = async () => {
+      validateForm()
+      data.inProgress = true
+      let created = false
+      if (data.valid) {
+        const jwtToken = appStore.getJwtKey
+        if (jwtToken) {
+          // get all data.
+          const username = (data.newUsername).toString().trim()
+          const password = (data.newPassword).toString()
+          const avatar = (data.newAvatar).toString().trim()
+          const info = (data.newInfo).toString().trim()
+          const cc = false
+          const admin = true
+
+          // concatenate all data.
+          const newAdminData: NewAdmin = {
+            username,
+            password,
+            avatar,
+            info,
+            cc,
+            admin
+          }
+
+          // send request.
+          const result = (await createAdmin(newAdminData, jwtToken)) as unknown as Admin
+          created = (result.username === username)
+        }
+      }
+      // notify the settings page.
+      emit('creation-done')
+      await setTimeout(() => {
+        if (created) {
+          closeDialog()
+        } else {
+          openConfirm('Admin account creation failed!', (() => 0))
+        }
+        data.inProgress = false
+      }, 500)
     }
 
     return {
@@ -218,6 +328,10 @@ export default defineComponent({
       passwordNotMatch,
       closeDialog,
       validateForm,
+      createTeacher,
+      closeConfirm,
+      openConfirm,
+      handleConfirmClicked,
       ...toRefs(data)
     }
   }
