@@ -3,7 +3,7 @@ export default async function (url: string): Promise<string> {
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
   const image = new Image()
   image.crossOrigin = 'anonymous'
-  await new Promise((resolve) => {
+  await new Promise<void>((resolve) => {
     image.onload = function () {
       canvas.width = image.naturalWidth
       canvas.height = image.naturalHeight

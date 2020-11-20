@@ -76,7 +76,7 @@ export default defineComponent({
 
     const loadHistory = async ($state: StateChanger) => {
       try {
-        await new Promise(resolve => setTimeout(() => resolve(), 500))
+        await new Promise<void>(resolve => setTimeout(() => resolve(), 500))
         if (await historyLoader(30)) {
           $state.loaded();
           if (data.notLoadYet) {
@@ -95,7 +95,7 @@ export default defineComponent({
         }
       } catch (e) {
         if (data.retry) {
-          await new Promise(resolve => setTimeout(() => resolve(), 1000))
+          await new Promise<void>(resolve => setTimeout(() => resolve(), 1000))
           data.retry--
           $state.loaded()
         } else {
