@@ -82,3 +82,7 @@ export interface SMap {
 export interface BMap {
   [key: string]: boolean
 }
+
+export interface UploadedMedia {
+  url: string
+}

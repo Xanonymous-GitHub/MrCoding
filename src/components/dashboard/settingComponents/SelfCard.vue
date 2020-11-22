@@ -12,9 +12,17 @@
           </v-icon>
         </v-avatar>
         <v-card-actions>
-          <v-btn class="mx-auto" color="info" text>
+          <v-btn :disabled="changingAvatar" :loading="changingAvatar" class="mx-auto"
+                 color="info" text @click.prevent.stop="uploadButtonClicked">
             {{ currentUser.avatar ? 'change' : 'add avatar' }}
           </v-btn>
+          <input
+              ref="uploader"
+              accept="image/*"
+              class="d-none"
+              type="file"
+              @change="onFileChanged($event)"
+          >
         </v-card-actions>
       </div>
 
@@ -78,10 +86,10 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, reactive, toRefs} from "@vue/composition-api";
-import {changeAdminInfo} from "@/api/api";
+import {defineComponent, reactive, toRefs, ref} from "@vue/composition-api";
+import {changeAdminAvatar, changeAdminInfo, uploadMedia} from "@/api/api";
 import appStore from "@/store/app";
-import {Admin} from "@/api/types/apiTypes";
+import {Admin, UploadedMedia} from "@/api/types/apiTypes";
 
 export default defineComponent({
   name: "SelfCard",
@@ -95,17 +103,20 @@ export default defineComponent({
       type: Object
     }
   },
-  setup({currentUser}) {
+  setup({currentUser}, {emit}) {
     const data = reactive({
       editInfoDialog: false,
       editInfoDialogKey: 0,
       currentUserInfoInEditMode: '',
       inProgress: false,
-      selfCardKey: 0
+      selfCardKey: 0,
+      changingAvatar: false
     })
 
+    const uploader = ref({} as HTMLInputElement)
+
     const openEditInfoDialog = () => {
-      data.currentUserInfoInEditMode = currentUser.info as string
+      data.currentUserInfoInEditMode = appStore.getCurrentUser?.info as string
       data.editInfoDialog = true
     }
 
@@ -131,10 +142,37 @@ export default defineComponent({
       }, 300)
     }
 
+    const onFileChanged = async (e: InputEvent) => {
+      data.changingAvatar = true
+      await changeAvatar(((e.target as HTMLInputElement).files as FileList)[0])
+      data.changingAvatar = false
+    }
+
+    const uploadButtonClicked = () => {
+      uploader.value.click()
+    }
+
+    const changeAvatar = async (file: File) => {
+      const jwtToken = appStore.getJwtKey
+      if (jwtToken) {
+        const {url} = (await uploadMedia(file, 'webp')) as unknown as UploadedMedia
+        if (url) {
+          const resultAdminPack = await changeAdminAvatar(currentUser._id, url, jwtToken) as unknown as Admin
+          if (!('statusCode' in resultAdminPack)) {
+            await appStore.setCurrentUser(resultAdminPack)
+            emit('refresh-avatar')
+          }
+        }
+      }
+    }
+
     return {
       modifyInfo,
       closeEditInfoDialog,
       openEditInfoDialog,
+      onFileChanged,
+      uploadButtonClicked,
+      uploader,
       ...toRefs(data)
     }
   }

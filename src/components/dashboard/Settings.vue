@@ -1,13 +1,14 @@
 <template>
   <v-main>
-    <SelfCard :current-user="currentUser" :is-dark-mode="isDarkMode"/>
-    <NewTeacherDialog :is-dark-mode="isDarkMode" @creation-done="refreshTeacherCardKey"/>
-    <UserCard :key="teacherCardKey" :is-dark-mode="isDarkMode"/>
+    <SelfCard :key="selfCardKey" :current-user="currentUser" :is-dark-mode="isDarkMode"
+              @refresh-avatar="refreshAvatar"/>
+    <NewTeacherDialog :key="dialogCardKey" :is-dark-mode="isDarkMode" @creation-done="refreshUserCardKey"/>
+    <UserCard :key="userCardKey" :is-dark-mode="isDarkMode"/>
   </v-main>
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, reactive, toRefs, onMounted} from "@vue/composition-api";
+import {computed, defineComponent, reactive, toRefs, onMounted, nextTick} from "@vue/composition-api";
 import appStore from "@/store/app";
 import replaceAvatar from "@/utils/replaceAvatar";
 import SelfCard from "@/components/dashboard/settingComponents/SelfCard.vue";
@@ -21,15 +22,28 @@ export default defineComponent({
     NewTeacherDialog,
     UserCard
   },
-  setup() {
+  setup(_, {emit}) {
     const data = reactive({
       isDarkMode: computed(() => appStore.isDarkMode),
       currentUser: computed(() => appStore.getCurrentUser),
-      teacherCardKey: 0
+      userCardKey: 0,
+      selfCardKey: 0,
+      dialogCardKey: 0,
     })
 
-    const refreshTeacherCardKey = () => {
-      data.teacherCardKey++
+    const refreshUserCardKey = () => {
+      data.userCardKey++
+    }
+
+    const refreshDialogCardKey = () => {
+      data.dialogCardKey++
+    }
+
+    const refreshAvatar = () => {
+      refreshUserCardKey()
+      refreshDialogCardKey()
+      nextTick(() => replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.profile') as HTMLElement))
+      emit('refresh-avatar')
     }
 
     onMounted(() => {
@@ -37,7 +51,8 @@ export default defineComponent({
     })
 
     return {
-      refreshTeacherCardKey,
+      refreshUserCardKey,
+      refreshAvatar,
       ...toRefs(data)
     }
   }

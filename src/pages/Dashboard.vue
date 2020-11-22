@@ -54,7 +54,7 @@
           </div>
         </v-app-bar>
         <keep-alive>
-          <router-view/>
+          <router-view @refresh-avatar="refreshAvatar"/>
         </keep-alive>
       </div>
     </main>
@@ -106,13 +106,18 @@ export default defineComponent({
       data.drawer = !data.drawer
     }
 
+    const refreshAvatar = () => {
+      replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.bar') as HTMLElement)
+    }
+
     onMounted(async () => {
       document.dispatchEvent(new Event('app-rendered'));
-      replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.bar') as HTMLElement)
+      refreshAvatar()
     })
 
     return {
       triggerDrawer,
+      refreshAvatar,
       ...toRefs(data)
     }
   }

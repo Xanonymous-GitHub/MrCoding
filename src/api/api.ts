@@ -7,11 +7,14 @@ import {
   ReadMessage,
   authResponse,
   Admin,
-  LiffUser, NewAdmin
+  LiffUser, NewAdmin, UploadedMedia
 } from "@/api/types/apiTypes";
+import {klona} from 'klona/full';
 
 axios.defaults.baseURL = 'https://mrcoding.org/api'
 axios.defaults.headers.common['Content-Type'] = 'application/json;charset=utf-8'
+
+const npcServicesApiUrl = 'https://asia-northeast1-npc-services.cloudfunctions.net'
 
 // eslint-disable-next-line
 const errorResolver = (e: any): ResponseError => {
@@ -240,6 +243,23 @@ export const jwtSignIn = async (jwtToken: string): Response<Admin | LiffUser> =>
     const {data} = await axios.get('/me', {
       headers: {
         Authorization: 'bearer ' + jwtToken
+      }
+    })
+    return data
+  } catch (e) {
+    return errorResolver(e)
+  }
+}
+
+export const uploadMedia = async (file: File, preferredType?: string): Response<UploadedMedia> => {
+  const uploadMediaAxios = klona(axios)
+  const formData = new FormData();
+  formData.append("file", file)
+  preferredType && formData.append("type", preferredType)
+  try {
+    const {data} = await uploadMediaAxios.post(npcServicesApiUrl + '/Image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
       }
     })
     return data
