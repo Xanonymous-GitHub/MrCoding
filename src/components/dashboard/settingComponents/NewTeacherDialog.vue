@@ -141,16 +141,25 @@
             <v-col cols="12">
               <v-container>
                 <v-row>
-                  <div class="d-flex flex-column ma-auto">
+                  <div id="newTeacherAvatar" class="d-flex flex-column ma-auto">
                     <v-avatar class="avatar" size="128">
                       <v-icon :dark="isDarkMode" size="128">
                         mdi-account-circle
                       </v-icon>
                     </v-avatar>
-                    <v-btn class="mx-auto" color="info" text>
-                      add avatar
+                    <v-btn :disabled="changingAvatar" :loading="changingAvatar" class="mx-auto my-2" color="info" text
+                           @click.prevent.stop="uploadButtonClicked">
+                      {{ newAvatarFile ? 'change' : 'add avatar' }}
                     </v-btn>
+                    <input
+                        ref="uploader"
+                        accept="image/*"
+                        class="d-none"
+                        type="file"
+                        @change="onFileChanged($event)"
+                    >
                   </div>
+                  <div class="my-2 mx-2"/>
                   <v-textarea
                       v-model="newInfo"
                       auto-grow
@@ -160,7 +169,7 @@
                       label="Biography"
                       outlined
                       value=""
-                  ></v-textarea>
+                  />
                 </v-row>
               </v-container>
             </v-col>
@@ -190,9 +199,11 @@
 
 <script lang="ts">
 import {defineComponent, reactive, ref, toRefs} from "@vue/composition-api";
-import {createAdmin} from "@/api/api";
-import {Admin, NewAdmin} from "@/api/types/apiTypes";
+import {createAdmin, uploadMedia} from "@/api/api";
+import {Admin, NewAdmin, UploadedMedia} from "@/api/types/apiTypes";
 import appStore from "@/store/app";
+import {toBase64} from "@/utils/avatarCompression";
+import replaceAvatar from "@/utils/replaceAvatar";
 
 export default defineComponent({
   name: "NewTeacherDialog",
@@ -212,17 +223,19 @@ export default defineComponent({
       newUsername: '',
       newPassword: '',
       newPasswordCheck: '',
-      newAvatar: '',
+      newAvatarFile: undefined as unknown as File,
       newInfo: '',
       passwordMatchStatusIcon: 'mdi-checkbox-blank-circle-outline',
       passwordMatchStatusIconColor: '',
       dialogKey: 0,
       confirmDialogKey: 0,
       valid: true,
-      inProgress: false
+      inProgress: false,
+      changingAvatar: false
     })
 
     const form = ref(undefined)
+    const uploader = ref({} as HTMLInputElement)
 
     const canNotEmpty = [
       (v: never) => !!v || 'required'
@@ -244,12 +257,12 @@ export default defineComponent({
 
     const closeDialog = () => {
       data.dialog = false
-
       setTimeout(() => {
         data.dialogKey++
         data.newUsername = ''
         data.newPassword = ''
         data.newPasswordCheck = ''
+        data.newAvatarFile = (() => false)() as unknown as File
       }, 300)
     }
 
@@ -290,10 +303,13 @@ export default defineComponent({
           // get all data.
           const username = (data.newUsername).toString().trim()
           const password = (data.newPassword).toString()
-          const avatar = (data.newAvatar).toString().trim()
           const info = (data.newInfo).toString().trim()
           const cc = false
           const admin = true
+
+          // upload avatar and get its url.
+          const {url} = (await uploadMedia(data.newAvatarFile, 'webp')) as unknown as UploadedMedia
+          const avatar = url ? (url).toString().trim() : ''
 
           // concatenate all data.
           const newAdminData: NewAdmin = {
@@ -322,16 +338,48 @@ export default defineComponent({
       }, 500)
     }
 
+    const onFileChanged = async (e: InputEvent) => {
+      data.changingAvatar = true
+      await changeAvatar(((e.target as HTMLInputElement).files as FileList)[0])
+      data.changingAvatar = false
+    }
+
+    const uploadButtonClicked = () => {
+      uploader.value.click()
+    }
+
+    const isFileImage = (file: File): boolean => {
+      const acceptedImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
+      return file && acceptedImageTypes.includes(file['type'])
+    }
+
+    const changeAvatar = async (file: File) => {
+      if (isFileImage(file)) {
+        if (file.size < 10 << 20) {
+          data.newAvatarFile = file
+          const tmpAvatar = (await toBase64(data.newAvatarFile)) as string
+          replaceAvatar(tmpAvatar, document.getElementById('newTeacherAvatar') as HTMLDivElement)
+        } else {
+          alert('File too big! Must under 10 MB.')
+        }
+      } else {
+        alert('Invalid file type!')
+      }
+    }
+
     return {
       form,
       canNotEmpty,
       passwordNotMatch,
+      uploader,
       closeDialog,
       validateForm,
       createTeacher,
       closeConfirm,
       openConfirm,
       handleConfirmClicked,
+      onFileChanged,
+      uploadButtonClicked,
       ...toRefs(data)
     }
   }

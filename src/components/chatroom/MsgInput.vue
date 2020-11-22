@@ -62,6 +62,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function sendMessage(e: any) {
       (document.getElementById('msgInput') as HTMLInputElement).focus()
+      // TODO focus problem
       e.preventDefault()
       e.stopPropagation()
       e.stopImmediatePropagation()

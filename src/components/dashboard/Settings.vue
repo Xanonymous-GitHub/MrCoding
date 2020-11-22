@@ -27,8 +27,8 @@ export default defineComponent({
       isDarkMode: computed(() => appStore.isDarkMode),
       currentUser: computed(() => appStore.getCurrentUser),
       userCardKey: 0,
-      selfCardKey: 0,
-      dialogCardKey: 0,
+      selfCardKey: 99999,
+      dialogCardKey: 878787,
     })
 
     const refreshUserCardKey = () => {
