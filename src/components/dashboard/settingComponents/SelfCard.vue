@@ -18,7 +18,7 @@
           </v-btn>
           <input
               ref="uploader"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/gif"
               class="d-none"
               type="file"
               @change="onFileChanged($event)"
@@ -152,17 +152,30 @@ export default defineComponent({
       uploader.value.click()
     }
 
+    const isFileImage = (file: File): boolean => {
+      const acceptedImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+      return file && acceptedImageTypes.includes(file['type'])
+    }
+
     const changeAvatar = async (file: File) => {
-      const jwtToken = appStore.getJwtKey
-      if (jwtToken) {
-        const {url} = (await uploadMedia(file, 'webp')) as unknown as UploadedMedia
-        if (url) {
-          const resultAdminPack = await changeAdminAvatar(currentUser._id, url, jwtToken) as unknown as Admin
-          if (!('statusCode' in resultAdminPack)) {
-            await appStore.setCurrentUser(resultAdminPack)
-            emit('refresh-avatar')
+      if (isFileImage(file)) {
+        if (file.size < 10 << 20) {
+          const jwtToken = appStore.getJwtKey
+          if (jwtToken) {
+            const {url} = (await uploadMedia(file, 'webp')) as unknown as UploadedMedia
+            if (url) {
+              const resultAdminPack = await changeAdminAvatar(currentUser._id, url, jwtToken) as unknown as Admin
+              if (!('statusCode' in resultAdminPack)) {
+                await appStore.setCurrentUser(resultAdminPack)
+                emit('refresh-avatar')
+              }
+            }
           }
+        } else {
+          alert('File too big! Must under 10 MB.')
         }
+      } else {
+        alert('Invalid file type!')
       }
     }
 

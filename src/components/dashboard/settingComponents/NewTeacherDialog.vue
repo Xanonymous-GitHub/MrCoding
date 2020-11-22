@@ -153,7 +153,7 @@
                     </v-btn>
                     <input
                         ref="uploader"
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/gif"
                         class="d-none"
                         type="file"
                         @change="onFileChanged($event)"
@@ -349,7 +349,7 @@ export default defineComponent({
     }
 
     const isFileImage = (file: File): boolean => {
-      const acceptedImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
+      const acceptedImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
       return file && acceptedImageTypes.includes(file['type'])
     }
 
