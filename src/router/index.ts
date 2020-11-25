@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import VueRouter, {RouteConfig} from 'vue-router'
+import VueRouter, {NavigationGuardNext, Route, RouteConfig} from 'vue-router'
 import appStore from '@/store/app'
 import autoLogin from "@/api/accountManager";
 
@@ -9,10 +9,13 @@ const routes: Array<RouteConfig> = [
   {
     path: '/',
     name: 'Home',
+    beforeEnter(to: Route, from: Route, next: NavigationGuardNext) {
+      next()
+    },
     component: () => import(
       /* webpackChunkName: "Home" */
       /* webpackPrefetch: true */
-      '@/pages/Home.vue'
+      '@/pages/Fixing.vue'
       )
   },
   {
@@ -41,10 +44,6 @@ const routes: Array<RouteConfig> = [
   {
     path: '/dashboard',
     name: 'Dashboard',
-    async beforeEnter(to, from, next) {
-      await autoLogin()
-      next()
-    },
     redirect: 'room-list',
     component: () => import(
       /* webpackChunkName: "Dashboard" */
@@ -53,7 +52,7 @@ const routes: Array<RouteConfig> = [
       ),
     children: [
       {
-        name: 'room-list',
+        name: 'RoomList',
         path: '',
         component: () => import(
           /* webpackChunkName: "RoomList" */
@@ -62,6 +61,7 @@ const routes: Array<RouteConfig> = [
           ),
       },
       {
+        name: 'Settings',
         path: '/settings',
         component: () => import(
           /* webpackChunkName: "Settings" */
@@ -86,6 +86,17 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+})
+
+router.beforeEach(async (to: Route, from: Route, next: NavigationGuardNext) => {
+  const nonProtectionPages = ['Home', 'Login']
+  if (!nonProtectionPages.includes(to.name ?? '')) {
+    await autoLogin()
+    if (!appStore.isLoggedIn) {
+      next({name: "Login"})
+    }
+  }
+  next()
 })
 
 export default router
