@@ -129,6 +129,7 @@ export default defineComponent({
         if (!('statusCode' in resultAdminPack)) {
           await appStore.setCurrentUser(resultAdminPack)
           data.selfCardKey++
+          emit('refresh-info')
         }
       }
       data.inProgress = false
@@ -169,6 +170,8 @@ export default defineComponent({
                 await appStore.setCurrentUser(resultAdminPack)
                 emit('refresh-avatar')
               }
+            } else {
+              alert('Fail to change avatar!')
             }
           }
         } else {

@@ -17,3 +17,8 @@ export async function getJwtTokenFromLocalStorage(): Promise<string | void> {
     }
   }
 }
+
+export async function removeJwt(): Promise<void> {
+  await localStorage.removeItem('jwtToken')
+  await localStorage.removeItem('jwtTokenExpireTime')
+}

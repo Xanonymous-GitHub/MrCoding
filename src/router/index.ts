@@ -90,11 +90,13 @@ const router = new VueRouter({
 
 router.beforeEach(async (to: Route, from: Route, next: NavigationGuardNext) => {
   const nonProtectionPages = ['Home', 'Login']
+  await autoLogin()
   if (!nonProtectionPages.includes(to.name ?? '')) {
-    await autoLogin()
-    if (!appStore.isLoggedIn) {
+    if (!appStore.isLoggedIn && process.env.NODE_ENV === 'production') {
       next({name: "Login"})
     }
+  } else if (to.name === 'Login' && appStore.isLoggedIn && process.env.NODE_ENV === 'production') {
+    next({path: "/dashboard"})
   }
   next()
 })

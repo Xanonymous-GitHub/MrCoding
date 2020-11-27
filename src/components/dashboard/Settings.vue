@@ -1,7 +1,7 @@
 <template>
   <v-main>
     <SelfCard :key="selfCardKey" :current-user="currentUser" :is-dark-mode="isDarkMode"
-              @refresh-avatar="refreshAvatar"/>
+              @refresh-avatar="refreshAvatar" @refresh-info="refreshSelfAvatar"/>
     <NewTeacherDialog :key="dialogCardKey" :is-dark-mode="isDarkMode" @creation-done="refreshUserCardKey"/>
     <UserCard :key="userCardKey" :is-dark-mode="isDarkMode"/>
   </v-main>
@@ -39,10 +39,14 @@ export default defineComponent({
       data.dialogCardKey++
     }
 
+    const refreshSelfAvatar = () => {
+      nextTick(() => replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.profile') as HTMLElement))
+    }
+
     const refreshAvatar = () => {
       refreshUserCardKey()
       refreshDialogCardKey()
-      nextTick(() => replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.profile') as HTMLElement))
+      refreshSelfAvatar()
       emit('refresh-avatar')
     }
 
@@ -53,6 +57,7 @@ export default defineComponent({
     return {
       refreshUserCardKey,
       refreshAvatar,
+      refreshSelfAvatar,
       ...toRefs(data)
     }
   }

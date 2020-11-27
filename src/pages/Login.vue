@@ -84,6 +84,7 @@ import '@/assets/scss/pages/login.scss'
 import {authResponse} from "@/api/types/apiTypes";
 import autoLogin from "@/api/accountManager";
 import {VApp, VForm, VTextField, VBtn} from 'vuetify/lib';
+import router from "@/router";
 
 export default defineComponent({
   name: "Login",
@@ -135,6 +136,7 @@ export default defineComponent({
           if (await getUserDataByJwtToken(token)) {
             await setJwtToLocalStorageWithExpire(token)
             startInput()
+            await router.push('/dashboard')
           } else {
             data.loginStatusMessages = 'jwt validation failed'
           }
