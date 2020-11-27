@@ -16,7 +16,7 @@
                 elevation="2" outlined rounded shaped tile>
           <v-card-title class="flex-nowrap justify-space-between">
             {{ chatroom.name }}
-            <v-avatar class="avatar">
+            <v-avatar class="avatar mx-2">
               <v-icon :dark="isDarkMode" large>
                 mdi-account-circle
               </v-icon>
