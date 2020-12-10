@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter, {NavigationGuardNext, Route, RouteConfig} from 'vue-router'
 import appStore from '@/store/app'
 import autoLogin from "@/api/accountManager";
+import {UserType} from "@/api/types/apiTypes";
 
 Vue.use(VueRouter)
 
@@ -32,7 +33,6 @@ const routes: Array<RouteConfig> = [
     name: 'Chatroom',
     async beforeEnter(to, from, next) {
       appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
-      await autoLogin()
       next()
     },
     component: () => import(
@@ -89,7 +89,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach(async (to: Route, from: Route, next: NavigationGuardNext) => {
-  const nonProtectionPages = ['Home', 'Login']
+  const nonProtectionPages = ['Home', 'Login', 'Chatroom', 'ChatroomRedirect']
   await autoLogin()
   if (!nonProtectionPages.includes(to.name ?? '')) {
     if (!appStore.isLoggedIn && process.env.NODE_ENV === 'production') {
@@ -97,6 +97,10 @@ router.beforeEach(async (to: Route, from: Route, next: NavigationGuardNext) => {
     }
   } else if (to.name === 'Login' && appStore.isLoggedIn && process.env.NODE_ENV === 'production') {
     next({path: "/dashboard"})
+  } else if (to.name === 'Chatroom' && !appStore.isLoggedIn) {
+    if (appStore.getUserType !== UserType.LIFFUSER) {
+      next({name: "Login"})
+    }
   }
   next()
 })

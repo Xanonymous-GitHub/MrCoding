@@ -11,29 +11,31 @@ export default async function autoLogin(): Promise<void> {
       appStore.SET_USER_TYPE(UserType.ADMIN)
       await getUserDataByJwtToken()
     } else {
-      try {
-        // init the liff instance.
-        await initializeLiff(liffId)
-        
-        // fetch the accessToken of this line user.
-        const lineAccessToken = getAccessToken() as string
+      await initializeLiff(liffId)
+      appStore.SET_USER_TYPE(UserType.LIFFUSER)
+    }
+  }
+}
 
-        // if get the accessToken successfully, confirm this is a liffuser.
-        appStore.SET_USER_TYPE(UserType.LIFFUSER)
-        
-        // send the accessToken to server to create a new liffUser and then get the jwtToken.
-        const {token} = await liffAuth(lineAccessToken) as authResponse
-        
-        // bind the liffUser to the chatroom.
-        const profile = await getLiffProfile()
-        await bindLineUserUidToChatroom(appStore.getCurrentChatRoomId, profile.userId)
-        
-        // use the jwtToken to get the liffUser's profile.
-        await getUserDataByJwtToken(token)
-        
-      } catch (e) {
-        // console.log(e)
-      }
+export const liffLogin = async (chatroomId?: string): Promise<void> => {
+  if (!(await getUserDataByJwtToken())) {
+    try {
+      // init the liff instance.
+      await initializeLiff(liffId)
+      // fetch the accessToken of this line user.
+      const lineAccessToken = getAccessToken() as string
+      
+      // send the accessToken to server to create a new liffUser and then get the jwtToken.
+      const {token} = await liffAuth(lineAccessToken) as authResponse
+      
+      // bind the liffUser to the chatroom.
+      const profile = await getLiffProfile()
+      chatroomId ? await bindLineUserUidToChatroom(chatroomId, profile.userId) : 0
+      
+      // use the jwtToken to get the liffUser's profile.
+      await getUserDataByJwtToken(token)
+    } catch (e) {
+      alert(e)
     }
   }
 }

@@ -21,16 +21,18 @@
 import {
   computed,
   defineComponent,
+  nextTick,
   onBeforeUnmount,
   onMounted,
   reactive,
+  Ref,
+  ref,
   toRefs,
-  nextTick, Ref, ref,
 } from '@vue/composition-api'
 import '@/assets/scss/pages/chatroom.scss'
 import appStore from '@/store/app'
 import {getChatRoom, getLatestMessage, sendMessage} from "@/api/api";
-import {ChatRoom, Message} from "@/api/types/apiTypes";
+import {ChatRoom, Message, UserType} from "@/api/types/apiTypes";
 import MsgArea from "@/components/chatroom/MsgArea.vue";
 import BottomController from "@/components/chatroom/BottomController.vue";
 import AppBar from "@/components/chatroom/AppBar.vue";
@@ -39,6 +41,8 @@ import {VApp} from 'vuetify/lib';
 import {scrollToElement} from "@/utils/scrollPositionMaintainer";
 import {disableBodyScroll} from 'body-scroll-lock';
 import replaceAvatar from "@/utils/replaceAvatar";
+import router from "@/router";
+import {liffLogin} from "@/api/accountManager";
 
 export default defineComponent({
   name: "ChatRoom",
@@ -48,7 +52,7 @@ export default defineComponent({
     VApp,
     AppBar
   },
-  setup(_, vm) {
+  setup() {
     const data = reactive({
       isDarkMode: computed(() => {
         const colorMode = appStore.isDarkMode
@@ -168,7 +172,7 @@ export default defineComponent({
       disableBodyScroll(msgArea)
 
       // set the current chatroom identify
-      const expectedChatRoomId = (vm.root.$route.params.chatroom as string) || ''
+      const expectedChatRoomId = (router.currentRoute.params['chatroom'] as string) || ''
 
       // validate the chatroom is exist or not.
       const chatRoom = (await getChatRoom(expectedChatRoomId)) as ChatRoom
@@ -181,7 +185,9 @@ export default defineComponent({
       data.roomName = chatRoom.name
       data.state = chatRoom.closed ? 'closed' : 'open'
       await appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
-
+      if (appStore.getUserType === UserType.LIFFUSER) {
+        await liffLogin(data.currentChatRoomId)
+      }
       // load socketIO instance factory function after login
       replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.app-bar__avatar') as HTMLElement)
       await initializeWebSocket()
