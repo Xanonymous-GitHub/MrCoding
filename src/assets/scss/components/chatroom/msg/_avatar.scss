@@ -1,6 +1,7 @@
 @mixin avatar {
   .avatar {
     position: relative;
+    overflow: hidden;
 
     .verified-badge {
       position: absolute;

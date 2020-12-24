@@ -59,6 +59,7 @@
 
       .chatroom-card {
         -webkit-overflow-scrolling: touch;
+        max-width: 350px;
 
         .avatar {
           img {
@@ -95,6 +96,12 @@
     .users {
       margin: 1em;
       user-select: none;
+    }
+
+    .logout-button {
+      position: fixed;
+      width: 256px;
+      bottom: 0;
     }
   }
 }

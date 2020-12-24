@@ -4,6 +4,7 @@
         :key="selfCardKey"
         :dark="isDarkMode"
         class="mx-auto justify-center d-flex flex-wrap"
+        max-width="1000"
     >
       <div>
         <v-avatar class="avatar ma-3" size="128">

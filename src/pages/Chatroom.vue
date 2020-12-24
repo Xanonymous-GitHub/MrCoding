@@ -129,7 +129,10 @@ export default defineComponent({
           await initializeWebSocket()
           checkIsSocketOnline()
         }
-        await sendMessage(data.currentChatRoomId, newMsg, appStore.getJwtKey as string)
+        const sendResult = (await sendMessage(data.currentChatRoomId, newMsg, appStore.getJwtKey as string))
+        if ('statusCode' in sendResult) {
+          await initChatroom()
+        }
       }
     }
 
@@ -149,13 +152,30 @@ export default defineComponent({
     }
 
     const handleVisibilityChange = async (): Promise<void> => {
-      const isOnline = checkIsSocketOnline()
       if (document.visibilityState === 'visible') {
-        if (!isOnline) {
-          await initializeWebSocket()
-          checkIsSocketOnline()
-        }
+        await autoReconnectDaemon()
       }
+    }
+
+    const autoReconnectDaemon = async () => {
+      const isOnline = checkIsSocketOnline()
+      if (!isOnline) {
+        await initializeWebSocket()
+      }
+    }
+
+    const initChatroom = async () => {
+      const expectedChatRoomId = (router.currentRoute.params['chatroom'] as string) || ''
+      // validate the chatroom is exist or not.
+      const chatRoom = (await getChatRoom(expectedChatRoomId)) as ChatRoom
+      if (('statusCode' in chatRoom) || (chatRoom?._id !== expectedChatRoomId)) {
+        alert('LOADING ERROR! this chatroom is not exist!')
+        await router.replace('/')
+        return
+      }
+      await appStore.SET_CHATROOM_ID(expectedChatRoomId)
+      data.roomName = chatRoom.name
+      data.state = chatRoom.closed ? 'closed' : 'open'
     }
 
     onMounted(async () => {
@@ -172,18 +192,7 @@ export default defineComponent({
       disableBodyScroll(msgArea)
 
       // set the current chatroom identify
-      const expectedChatRoomId = (router.currentRoute.params['chatroom'] as string) || ''
-
-      // validate the chatroom is exist or not.
-      const chatRoom = (await getChatRoom(expectedChatRoomId)) as ChatRoom
-      if (('statusCode' in chatRoom) || (chatRoom?._id !== expectedChatRoomId)) {
-        // alert('LOADING ERROR! this chatroom is not exist!')
-        // await (vm.root.$options.router as VueRouter).push('/')
-        return
-      }
-      await appStore.SET_CHATROOM_ID(expectedChatRoomId)
-      data.roomName = chatRoom.name
-      data.state = chatRoom.closed ? 'closed' : 'open'
+      await initChatroom()
       await appStore.CLEAN_CURRENT_CHATROOM_MESSAGES_BOX()
       if (appStore.getUserType === UserType.LIFFUSER) {
         await liffLogin(data.currentChatRoomId)
@@ -192,6 +201,7 @@ export default defineComponent({
       replaceAvatar(appStore.getCurrentUser?.avatar, document.querySelector('.app-bar__avatar') as HTMLElement)
       await initializeWebSocket()
       document.addEventListener('visibilitychange', handleVisibilityChange)
+      setInterval(autoReconnectDaemon, 300)
     })
 
     onBeforeUnmount(() => {

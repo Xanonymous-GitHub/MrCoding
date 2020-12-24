@@ -39,9 +39,12 @@
                   <v-icon class="verified-badge" size="20">mdi-check-decagram</v-icon>
                 </span>
                 </v-list-item-title>
-                <v-list-item-subtitle>
+                <v-list-item-subtitle class="v-size--x-small">
                   {{ teachers._id }}
                 </v-list-item-subtitle>
+                <v-card-text>
+                  {{ teachers.info }}
+                </v-card-text>
               </v-list-item-content>
             </v-list-item>
           </template>
@@ -118,8 +121,8 @@ export default defineComponent({
     })
 
     const loadUsers = async () => {
-      const teacherHeader = {header: 'Mr.Coding Teachers'}
-      const studentHeader = {header: 'Participants'}
+      const teacherHeader = {header: 'Other Mr.Coding Teachers'}
+      const studentHeader = {header: 'All Participants'}
       const divider = {divider: true, inset: true}
       data.teachers.push(teacherHeader)
       data.students.push(studentHeader)
@@ -132,8 +135,10 @@ export default defineComponent({
         for (const user of users) {
           if ('admin' in user) {
             if (user['admin']) {
-              data.teachers.push(user)
-              data.teachers.push(divider)
+              if (user['_id'] !== appStore.getCurrentUser?._id) {
+                data.teachers.push(user)
+                data.teachers.push(divider)
+              }
             } else {
               data.students.push(user)
               data.students.push(divider)

@@ -27,12 +27,15 @@
           </v-card-text>
           <v-card-actions class="justify-space-between">
             <span>
-              <v-btn :href="'/chatroom/'+chatroom._id" color="primary" depressed
-                     rel="noreferrer noopener"
-                     target="_blank" text>Enter
+              <v-btn :href="'/chatroom/'+chatroom._id" class="mr-3" color="primary"
+                     depressed
+                     rel="noreferrer noopener" target="_blank" text>
+                  <v-icon dark left small class="mr-1">mdi-open-in-new</v-icon>
+                  Enter
               </v-btn>
               <v-btn :color="chatroom.closed?'green':'error'" depressed text
                      @click.prevent.stop="changeRoomStatus(chatroom._id)">
+                <v-icon dark left small class="mr-1">mdi-{{ chatroom.closed ? 'reload' : 'close-circle-outline' }}</v-icon>
                 {{ chatroom.closed ? 'open' : 'close' }}
               </v-btn>
             </span>

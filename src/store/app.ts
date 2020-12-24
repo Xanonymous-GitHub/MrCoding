@@ -1,6 +1,6 @@
 import {Action, Module, Mutation, VuexModule, getModule} from 'vuex-module-decorators'
 import {Message, ThemeModes, Admin, LiffUser, UserType} from '@/api/types/apiTypes'
-import getBase64ImgPath from '@/utils/avatarCompression'
+// import getBase64ImgPath from '@/utils/avatarCompression'
 import {getSpecificUser} from '@/api/api'
 import store from '@/store/index'
 
@@ -37,9 +37,9 @@ class AppStore extends VuexModule {
   private isOnLine = false
   
   private static async newUser(originalData: LiffUser | Admin): Promise<LiffUser | Admin> {
-    if (originalData && 'avatar' in originalData && originalData.avatar) {
-      originalData.avatar = await getBase64ImgPath(originalData.avatar)
-    }
+    // if (originalData && 'avatar' in originalData && originalData.avatar) {
+    //   originalData.avatar = await getBase64ImgPath(originalData.avatar)
+    // }
     return originalData
   }
   

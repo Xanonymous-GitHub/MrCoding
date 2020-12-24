@@ -28,6 +28,9 @@
                 <v-list-item-title>Settings</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+          </v-list>
+
+          <v-list>
             <v-list-item link @click.prevent.stop="logout">
               <v-list-item-action>
                 <v-icon>mdi-logout</v-icon>

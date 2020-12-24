@@ -4,12 +4,12 @@
       <VIcon v-if="!avatar" :dark="isDarkMode">
         mdi-account-circle
       </VIcon>
-      <img
+      <v-img
           v-if="avatar"
           :src="avatar"
           alt="Avatar"
           class="avatar"
-      >
+      ></v-img>
     </VAvatar>
     <VIcon v-if="verified" class="verified-badge verified-badge__layer" x-small>mdi-checkbox-blank-circle</VIcon>
     <VIcon v-if="verified" class="verified-badge" x-small>mdi-check-decagram</VIcon>
