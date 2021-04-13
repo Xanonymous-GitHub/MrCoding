@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@better-scroll/core": "^2.0.6",
-    "@line/liff": "^2.6.0",
+    "@line/liff": "^2.9.0",
     "@types/socket.io-client": "^1.4.34",
     "@typescript-eslint/eslint-plugin": "^4.11.0",
     "@typescript-eslint/parser": "^4.11.0",
